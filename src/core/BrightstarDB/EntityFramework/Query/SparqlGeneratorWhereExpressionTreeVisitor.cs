@@ -106,7 +106,11 @@ namespace BrightstarDB.EntityFramework.Query
                     if (varname != null)
                     {
                         string filter;
+#if NETCORE
+                        if (variableExpression.Type.GetTypeInfo().IsValueType && defValue != null)
+#else
                         if (variableExpression.Type.IsValueType && defValue != null)
+#endif
                         {
                             filter = equalityExpression.NodeType == ExpressionType.NotEqual
                                 ? "(bound(?{0}) && (?{0} != {1}))"
@@ -398,7 +402,7 @@ namespace BrightstarDB.EntityFramework.Query
 
             if (sourceVarName != null)
             {
-#if PORTABLE
+#if PORTABLE || NETCORE
                 if (expression.Member is PropertyInfo)
 #else
                 if (expression.Member.MemberType == MemberTypes.Property)
@@ -663,7 +667,7 @@ namespace BrightstarDB.EntityFramework.Query
                 if ((arg1.Type == typeof (bool) && (bool) arg1.Value) ||
                     (arg1.Type == typeof (StringComparison) &&
                      ((StringComparison) arg1.Value == StringComparison.CurrentCultureIgnoreCase ||
-#if !PORTABLE
+#if !PORTABLE && !NETCORE
                          (StringComparison) arg1.Value == StringComparison.InvariantCultureIgnoreCase ||
 #endif
                          (StringComparison) arg1.Value == StringComparison.OrdinalIgnoreCase)))
@@ -694,7 +698,7 @@ namespace BrightstarDB.EntityFramework.Query
 
             if (!String.IsNullOrEmpty(sourceVarName))
             {
-#if PORTABLE
+#if PORTABLE || NETCORE
                 if (expression.Member is PropertyInfo)
 #else
                 if (expression.Member.MemberType == MemberTypes.Property)
@@ -955,7 +959,7 @@ namespace BrightstarDB.EntityFramework.Query
             return base.VisitQuerySourceReferenceExpression(expression);
         }
 
-        #region Overrides of ThrowingExpressionTreeVisitor
+#region Overrides of ThrowingExpressionTreeVisitor
 
         // Called when a LINQ expression type is not handled above.
         protected override Exception CreateUnhandledItemException<T>(T unhandledItem, string visitMethod)
@@ -966,7 +970,7 @@ namespace BrightstarDB.EntityFramework.Query
             return new NotSupportedException(message);
         }
 
-        #endregion
+#endregion
 
         internal Expression VisitExpression(BinaryExpression expression, bool inBooleanExpression)
         {

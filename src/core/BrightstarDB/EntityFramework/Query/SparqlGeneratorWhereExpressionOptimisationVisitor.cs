@@ -155,11 +155,7 @@ namespace BrightstarDB.EntityFramework.Query
         ///             be returned holding the new child nodes. If the node has no children or the visitor does not replace any child node, the method should
         ///             return this <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/>. 
         /// </remarks>
-#if WINDOWS_PHONE || PORTABLE
         protected internal override Expression VisitChildren(ExpressionTreeVisitor visitor)
-#else
-        protected override Expression  VisitChildren(ExpressionTreeVisitor visitor)
-#endif
         {
             return this;
         }

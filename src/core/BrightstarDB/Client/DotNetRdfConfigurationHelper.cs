@@ -1,4 +1,5 @@
 ﻿using System;
+using BrightstarDB.Storage.Persistence;
 using VDS.RDF;
 using VDS.RDF.Configuration;
 #if PORTABLE
@@ -14,6 +15,16 @@ namespace BrightstarDB.Client
         public static IGraph LoadConfiguration(string configurationPath)
         {
             var pm = PlatformAdapter.Resolve<IPersistenceManager>();
+            ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
+            using (var stream = pm.GetInputStream(configurationPath))
+            {
+                return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
+            }
+        }
+#elif NETCORE
+        public static IGraph LoadConfiguration(string configurationPath)
+        {
+            var pm = new FilePersistenceManager();
             ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
             using (var stream = pm.GetInputStream(configurationPath))
             {

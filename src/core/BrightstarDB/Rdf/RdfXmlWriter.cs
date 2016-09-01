@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Xml;
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Rdf
 {

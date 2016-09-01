@@ -13,12 +13,16 @@ namespace BrightstarDB.Server
             _connectionStream = connectionStream;
         }
 
+#if NETCORE
+        public void Close()
+#else
         public override void Close()
+#endif
         {
             _connectionStream.IsProducerClosed = true;
         }
 
-        #region Overrides of Stream
+#region Overrides of Stream
 
         /// <summary>
         /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
@@ -131,7 +135,7 @@ namespace BrightstarDB.Server
             set { throw new NotSupportedException(); }
         }
 
-        #endregion
+#endregion
     }
 }
 #endif

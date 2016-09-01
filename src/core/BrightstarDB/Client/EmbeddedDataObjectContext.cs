@@ -35,7 +35,7 @@ namespace BrightstarDB.Client
             if (connectionString == null) throw new ArgumentNullException("connectionString");
             if (connectionString.Type != ConnectionType.Embedded) throw new ArgumentException("Invalid connection type", "connectionString");
 
-            if (serviceConfigurationOptions == null) serviceConfigurationOptions = Configuration.EmbeddedServiceConfiguration;
+            if (serviceConfigurationOptions == null) serviceConfigurationOptions = Configuration.EmbeddedServiceConfiguration ?? new EmbeddedServiceConfiguration();
             _serverCore = ServerCoreManager.GetServerCore(
                 connectionString.StoresDirectory,
                 serviceConfigurationOptions);

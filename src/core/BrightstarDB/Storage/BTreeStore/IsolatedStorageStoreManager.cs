@@ -1,4 +1,4 @@
-﻿#if !PORTABLE
+﻿#if !PORTABLE && !NETCORE
 using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage.BTreeStore

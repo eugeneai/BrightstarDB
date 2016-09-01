@@ -170,9 +170,17 @@ namespace BrightstarDB.EntityFramework
             if (_interfaceMappings.TryGetValue(type, out interfaceType))
             {
                 if (_identityInfo.TryGetValue(interfaceType, out ret)) return ret;
+#if NETCORE
+                if (interfaceType.GetTypeInfo().BaseType != null) return _GetIdentityInfo(interfaceType.GetTypeInfo().BaseType);
+#else
                 if (interfaceType.BaseType != null) return _GetIdentityInfo(interfaceType.BaseType);
+#endif
             }
+#if NETCORE
+            return type.GetTypeInfo().BaseType != null ? _GetIdentityInfo(type.GetTypeInfo().BaseType) : null;
+#else
             return type.BaseType != null ? _GetIdentityInfo(type.BaseType) : null;
+#endif
         }
 
         /// <summary>
@@ -337,6 +345,6 @@ namespace BrightstarDB.EntityFramework
             return null;
         }
 
-        #endregion
+#endregion
     }
 }

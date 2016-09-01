@@ -10,6 +10,10 @@ using BrightstarDB.Portable.Compatibility;
 #else
 using System.Collections.Specialized;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+using System.Reflection;
+#endif
 using Remotion.Linq;
 using Remotion.Linq.Parsing.Structure;
 

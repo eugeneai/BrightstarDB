@@ -31,6 +31,7 @@
     <TreatWarningsAsErrors Condition=" '$(OS)' != 'Windows_NT' ">false</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -95,10 +96,6 @@
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\tools\Polaris\packages\Newtonsoft.Json.8.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -493,6 +490,9 @@
     <Compile Include="Utils\SparqlQueryHelper.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
     <Compile Include="Utils\XmlExtensions.cs" />
+    <Compile Include="..\..\vendor\relinq\RelinqCore\**\*.cs" Exclude="..\..\vendor\relinq\RelinqCore\Properties\*.cs">
+      <Link>relinq\%(recursivedir)\%(filename)</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strings.resx">

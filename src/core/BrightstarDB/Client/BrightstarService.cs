@@ -167,8 +167,8 @@ namespace BrightstarDB.Client
             ISparqlUpdateProcessor updateProcessor = null;
             if (!String.IsNullOrEmpty(connectionString.DnrUpdate))
             {
-#if PORTABLE || SILVERLIGHT
-                throw new NotSupportedException("The PCL and mobile builds of BrightstarDB do not currently support stores that use SPARQL Update. The store may be opened as a read-only store by removing the update= parameter in the connection string.");
+#if PORTABLE || SILVERLIGHT || NETCORE
+                throw new NotSupportedException("The PCL, mobile and .NET Core builds of BrightstarDB do not currently support stores that use SPARQL Update. The store may be opened as a read-only store by removing the update= parameter in the connection string.");
 #else
                 var updateEndpoint = new SparqlRemoteUpdateEndpoint(new Uri(connectionString.DnrUpdate));
                 if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))

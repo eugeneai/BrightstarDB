@@ -142,7 +142,7 @@ namespace BrightstarDB.Client
                 {
                     _updateProcessor = queryObject as ISparqlUpdateProcessor;
                 }
-#if !WINDOWS_PHONE && !PORTABLE
+#if !WINDOWS_PHONE && !PORTABLE && !NETCORE
                 else if (updateObject is SparqlRemoteUpdateEndpoint)
                 {
                     _updateProcessor = new RemoteUpdateProcessor(updateObject as SparqlRemoteUpdateEndpoint);
@@ -164,6 +164,15 @@ namespace BrightstarDB.Client
             var pm = PlatformAdapter.Resolve<IPersistenceManager>();
             ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
             using (var stream = pm.GetInputStream(configurationPath))
+            {
+                return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
+            }
+        }
+#elif NETCORE
+        private static IGraph LoadConfiguration(string configurationPath)
+        {
+            ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
+            using (var stream = System.IO.File.OpenRead(configurationPath))
             {
                 return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
             }

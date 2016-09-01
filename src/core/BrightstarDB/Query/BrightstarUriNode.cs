@@ -3,7 +3,7 @@ using VDS.RDF;
 
 namespace BrightstarDB.Query
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal class BrightstarUriNode : UriNode

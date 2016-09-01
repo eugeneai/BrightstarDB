@@ -2,7 +2,7 @@
 
 namespace BrightstarDB.Storage
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal class InvalidCommitPointException : BrightstarInternalException

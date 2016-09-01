@@ -85,7 +85,7 @@ namespace BrightstarDB.EntityFramework.Query
             }
             if (!String.IsNullOrEmpty(sourceVarName))
             {
-#if PORTABLE
+#if PORTABLE || NETCORE
                 if (expression.Member is PropertyInfo)
 #else
                 if (expression.Member.MemberType == MemberTypes.Property)
@@ -264,7 +264,7 @@ namespace BrightstarDB.EntityFramework.Query
                 var fieldInfo = m as FieldInfo;
                 return fieldInfo.FieldType;
             }
-#if PORTABLE
+#if PORTABLE || NETCORE
             throw new ArgumentException("Unexpected member type", "m");
 #else
             throw new ArgumentException(String.Format("Unexpected member type: {0}", m.MemberType), "m");
@@ -391,7 +391,7 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
-        public Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
+        protected override Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
         {
             _queryBuilder.AddSelectVariable(expression.Name);
             return expression;

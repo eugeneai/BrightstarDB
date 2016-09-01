@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {

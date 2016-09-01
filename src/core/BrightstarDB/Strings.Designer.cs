@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Reflection;
+
 namespace BrightstarDB {
     using System;
     
@@ -39,7 +41,11 @@ namespace BrightstarDB {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BrightstarDB.Strings", typeof(Strings).Assembly);
+#if NETCORE
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BrightstarDB.Strings", typeof(Strings).GetTypeInfo().Assembly);
+#else
+                             global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BrightstarDB.Strings", typeof(Strings).Assembly);
+#endif
                     resourceMan = temp;
                 }
                 return resourceMan;

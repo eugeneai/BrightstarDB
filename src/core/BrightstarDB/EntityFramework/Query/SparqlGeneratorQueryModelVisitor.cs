@@ -21,7 +21,11 @@ namespace BrightstarDB.EntityFramework.Query
             var visitor = new SparqlGeneratorQueryModelVisitor(context);
             visitor.VisitQueryModel(queryModel);
             var resultType = queryModel.GetResultType();
+#if NETCORE
+            if (resultType.GetTypeInfo().IsGenericType)
+#else
             if (resultType.IsGenericType)
+#endif
             {
                 resultType = resultType.GetGenericArguments()[0];
             }
@@ -62,7 +66,7 @@ namespace BrightstarDB.EntityFramework.Query
                             {
                                 var qsr = memberExpression.Expression as QuerySourceReferenceExpression;
                                 if (qsr.ReferencedQuerySource.Equals(queryModel.MainFromClause) &&
-#if PORTABLE
+#if PORTABLE || NETCORE
                                     memberExpression.Member is PropertyInfo)
 #else
                                     memberExpression.Member.MemberType == MemberTypes.Property)
@@ -104,7 +108,7 @@ namespace BrightstarDB.EntityFramework.Query
                                             Equals(
                                                 queryModel.MainFromClause))
                                     {
-#if PORTABLE
+#if PORTABLE || NETCORE
                                         if (member.Member is PropertyInfo)
 #else
                                         if (member.Member.MemberType == MemberTypes.Property)

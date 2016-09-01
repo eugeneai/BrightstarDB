@@ -8,6 +8,9 @@ using BrightstarDB.Storage.TransactionLog;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BTreeStore
 {

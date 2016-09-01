@@ -58,7 +58,7 @@ namespace BrightstarDB.Storage.Persistence
             _flushRequired = false;
         }
 
-#if PORTABLE
+#if PORTABLE || NETCORE
         /// <summary>
         /// Closes the current stream and releases any resources (such as sockets and file handles) associated with the current stream.
         /// </summary>

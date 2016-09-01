@@ -31,7 +31,11 @@ namespace BrightstarDB.EntityFramework
         public void AddMappingsForContext(EntityMappingStore mappingStore, EntityContext context)
         {
             var contextType = context.GetType();
+#if NETCORE
+            var contextAssembly = contextType.GetTypeInfo().Assembly;
+#else
             var contextAssembly = contextType.Assembly;
+#endif
             AssemblyMappingInfo assemblyMappings;
             if (!_assemblyMappings.TryGetValue(contextAssembly.FullName, out assemblyMappings))
             {
@@ -41,8 +45,13 @@ namespace BrightstarDB.EntityFramework
             var queryableGeneric = typeof (IQueryable<object>).GetGenericTypeDefinition();
             foreach(var p in contextType.GetProperties())
             {
-                if (p.PropertyType.IsGenericType &&
+#if NETCORE
+                if (p.PropertyType.GetTypeInfo().IsGenericType &&
                     queryableGeneric.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
+#else
+                    if (p.PropertyType.IsGenericType &&
+                    queryableGeneric.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
+#endif
                 {
                     var genericParam = p.PropertyType.GetGenericArguments()[0];
                     AddMappingsForType(mappingStore, genericParam);
@@ -58,7 +67,11 @@ namespace BrightstarDB.EntityFramework
         /// <param name="mappedType">The entity implementation type to be processed</param>
         public void AddMappingsForType(EntityMappingStore mappingStore, Type mappedType)
         {
+#if NETCORE
+            var mappedTypeAssembly = mappedType.GetTypeInfo().Assembly;
+#else
             var mappedTypeAssembly = mappedType.Assembly;
+#endif
             AssemblyMappingInfo assemblyMappings;
             if (!_assemblyMappings.TryGetValue(mappedTypeAssembly.FullName, out assemblyMappings))
             {
@@ -90,10 +103,15 @@ namespace BrightstarDB.EntityFramework
 
         private static void AddMappingsForType(EntityMappingStore mappingStore, AssemblyMappingInfo assemblyMappingInfo, Type mappedType)
         {
+#if NETCORE
+            var entityAttribute =
+                mappedType.GetTypeInfo().GetCustomAttributes(typeof(EntityAttribute), false).OfType<EntityAttribute>().
+                    FirstOrDefault();
+#else
             var entityAttribute =
                 mappedType.GetCustomAttributes(typeof (EntityAttribute), false).OfType<EntityAttribute>().
                     FirstOrDefault();
-            
+#endif       
             if (entityAttribute != null)
             {
                 var entityTypeIdentifier = entityAttribute.Identifier ?? GetImplTypeName(mappedType);
@@ -152,11 +170,11 @@ namespace BrightstarDB.EntityFramework
                             var propertyUri =
                                 assemblyMappingInfo.ResolveIdentifier((attr as InversePropertyTypeAttribute).Identifier);
                             var targetType = p.PropertyType;
-                            if (targetType.IsGenericType)
+                            if (IsGenericType(targetType))
                             {
                                 targetType = targetType.GetGenericArguments().First();
                             }
-                            if (targetType.GetCustomAttributes(typeof(EntityAttribute), false).Any())
+                            if (GetEntityAttributes(targetType).Any())
                             {
                                 mappingStore.SetPropertyHint(p,
                                                              new PropertyHint(PropertyMappingType.InverseArc,
@@ -174,8 +192,11 @@ namespace BrightstarDB.EntityFramework
                         {
                             var inversePropertyAttr = attr as InversePropertyAttribute;
                             var targetType = p.PropertyType;
-                            if (targetType.IsGenericType) targetType = targetType.GetGenericArguments().First();
-                            if (!targetType.GetCustomAttributes(typeof(EntityAttribute), true).Any())
+                            if (IsGenericType(targetType))
+                            {
+                                targetType = targetType.GetGenericArguments().First();
+                            }
+                            if (!GetEntityAttributes(targetType).Any())
                             {
                                 throw new ReflectionMappingException(
                                     String.Format(
@@ -205,6 +226,31 @@ namespace BrightstarDB.EntityFramework
                     }
                 }
             }
+        }
+
+        private static bool IsGenericType(Type t)
+        {
+#if NETCORE
+            return t.GetTypeInfo().IsGenericType;
+#else
+            return t.IsGenericType;
+#endif
+        }
+        private static IEnumerable<EntityAttribute> GetEntityAttributes(Type t)
+        {
+#if NETCORE
+            return t.GetTypeInfo().GetCustomAttributes<EntityAttribute>(true);
+#else
+#endif
+        }
+
+        private static bool ContainsGenericParameters(Type t)
+        {
+#if NETCORE
+            return t.GetTypeInfo().ContainsGenericParameters;
+#else
+            return t.ContainsGenericParameters;
+#endif
         }
 
         private static IdentityInfo GetIdentityInfo(AssemblyMappingInfo assemblyMappingInfo, Type entityType,
@@ -271,12 +317,11 @@ namespace BrightstarDB.EntityFramework
         private static bool IsResource(Type type)
         {
             var targetType = type;
-            if (targetType.IsGenericType && !targetType.ContainsGenericParameters)
+            if (IsGenericType(targetType) && !ContainsGenericParameters(targetType))
             {
                 targetType = targetType.GetGenericArguments().FirstOrDefault();
             }
-            return 
-                targetType.GetCustomAttributes(typeof(EntityAttribute), false).Any();
+            return GetEntityAttributes(targetType).Any();
         }
 
         private static string GetImplTypeName(Type type)
@@ -306,7 +351,11 @@ namespace BrightstarDB.EntityFramework
 
         private static PropertyInfo[] GetPublicProperties(Type type)
         {
+#if NETCORE
+            if (type.GetTypeInfo().IsInterface)
+#else
             if (type.IsInterface)
+#endif
             {
                 var propertyInfos = new List<PropertyInfo>();
 
@@ -351,12 +400,27 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
+        private static IEnumerable<TypeIdentifierPrefixAttribute> GetTypeIdentifierPrefixAttributes(Assembly assembly)
+        {
+#if NETCORE
+            return assembly.GetCustomAttributes<TypeIdentifierPrefixAttribute>();
+#else
+            return assembly.GetCustomAttributes(typeof (TypeIdentifierPrefixAttribute), false).OfType<TypeIdentifierPrefixAttribute>();
+#endif
+        }
+
+        private static IEnumerable<NamespaceDeclarationAttribute> GetNamespaceDeclarationAttributes(Assembly assembly)
+        {
+#if NETCORE
+            return assembly.GetCustomAttributes<NamespaceDeclarationAttribute>();
+#else
+#endif
+        }
+
         private static AssemblyMappingInfo GetAssemblyMappingInfo(Assembly assembly)
         {
             var ret = new AssemblyMappingInfo();
-            var baseIdentifierAttr =
-                assembly.GetCustomAttributes(typeof (TypeIdentifierPrefixAttribute), false).OfType<TypeIdentifierPrefixAttribute>().
-                    FirstOrDefault();
+            var baseIdentifierAttr = GetTypeIdentifierPrefixAttributes(assembly).FirstOrDefault();
             if (baseIdentifierAttr != null)
             {
                 ret.BaseUri = new Uri(baseIdentifierAttr.BaseUri);
@@ -366,7 +430,7 @@ namespace BrightstarDB.EntityFramework
                 ret.BaseUri = DefaultBaseUri;
             }
 
-            foreach(var prefixAttr in assembly.GetCustomAttributes(typeof(NamespaceDeclarationAttribute), false).OfType<NamespaceDeclarationAttribute>())
+            foreach(var prefixAttr in GetNamespaceDeclarationAttributes(assembly))
             {
                 ret.PrefixMappings[prefixAttr.Prefix] = prefixAttr.Reference;
             }

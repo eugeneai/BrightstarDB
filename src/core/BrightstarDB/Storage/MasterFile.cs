@@ -12,6 +12,10 @@ using Array = BrightstarDB.Portable.Compatibility.Array;
 using System.Collections.Concurrent;
 #endif
 
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
+
 namespace BrightstarDB.Storage
 {
     internal class MasterFile

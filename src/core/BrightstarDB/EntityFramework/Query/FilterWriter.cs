@@ -77,7 +77,7 @@ namespace BrightstarDB.EntityFramework.Query
 
             if (sourceVarName != null)
             {
-#if PORTABLE
+#if PORTABLE || NETCORE
                 if (expression.Member is PropertyInfo)
 #else
                 if (expression.Member.MemberType == MemberTypes.Property)
@@ -539,28 +539,16 @@ namespace BrightstarDB.EntityFramework.Query
             Expression mappedExpression;
             if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
             {
-#if WINDOWS_PHONE || PORTABLE
                 if (mappedExpression is SelectVariableNameExpression)
                 {
                     return VisitSelectVariableNameExpression(mappedExpression as SelectVariableNameExpression);
                 }
                 return VisitExpression(mappedExpression);
-#else
-                return VisitExpression(mappedExpression);
-#endif
             }
             return base.VisitQuerySourceReferenceExpression(expression);
         }
 
-#if !WINDOWS_PHONE && !PORTABLE
-        protected override Expression VisitExtensionExpression(ExtensionExpression expression)
-        {
-            var selectVariableNameExpression = expression as SelectVariableNameExpression;
-            return selectVariableNameExpression != null ? VisitSelectVariableNameExpression(selectVariableNameExpression) : base.VisitExtensionExpression(expression);
-        }
-#endif
-
-        protected Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
+        protected override Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
         {
             _filterExpressionBuilder.AppendFormat("?{0}", expression.Name);
             return expression;

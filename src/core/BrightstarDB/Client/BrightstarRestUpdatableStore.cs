@@ -7,6 +7,9 @@ using BrightstarDB.Rdf;
 #if PORTABLE
 using VDS.RDF; // Pulls in the extension methods for Close() on streams
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Client
 {

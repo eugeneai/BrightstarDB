@@ -2,9 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using BrightstarDB.Client;
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.EntityFramework
 {
@@ -255,11 +259,15 @@ namespace BrightstarDB.EntityFramework
                 //return new T[0].FirstOrDefault(); // TODO : Find a better way to get the default value
             }
             var propertyType = GetPropertyUri(propertyName);
+#if NETCORE
+            if (typeof(T).GetTypeInfo().IsEnum)
+#else
             if (typeof(T).IsEnum)
+#endif
             {
                 var enumValue = DataObject.GetPropertyValue(propertyType);
                 var valueDefinedByEnum = enumValue != null && Enum.IsDefined(typeof(T), enumValue);
-                var isFlagsEnum = typeof(T).GetCustomAttributes(typeof(FlagsAttribute), true).Any();
+                var isFlagsEnum = IsFlagsEnum(typeof(T));
                 return (enumValue != null && (valueDefinedByEnum || isFlagsEnum))
                            ? (T)Enum.ToObject(typeof(T), DataObject.GetPropertyValue(propertyType))
                            : default(T);
@@ -270,18 +278,22 @@ namespace BrightstarDB.EntityFramework
                 object ret = value == null ? null : new Uri(value.Identity);
                 return (T) ret;
             }
-            if (typeof(T).IsNullable() && typeof(T).GetGenericArguments()[0].IsEnum)
+            if (IsNullableEnumGeneric(typeof(T)))
             {
                 var enumType = typeof (T).GetGenericArguments()[0];
                 var enumValue = DataObject.GetPropertyValue(propertyType);
                 var valueDefinedByEnum = enumValue!=null && Enum.IsDefined(enumType, enumValue);
-                var isFlagsEnum = enumType.GetCustomAttributes(typeof(FlagsAttribute), true).Any();
+                var isFlagsEnum = IsFlagsEnum(enumType);
                 return (enumValue != null && (valueDefinedByEnum||isFlagsEnum))
                            ? (T) Enum.ToObject(enumType, enumValue)
                            : default(T);
             }
             object returnValue = DataObject.GetPropertyValue(propertyType);
+#if NETCORE
+            if (returnValue == null && typeof(T).GetTypeInfo().IsValueType) return default(T);
+#else
             if (returnValue == null && typeof(T).IsValueType) return default(T);
+#endif
             if (typeof(T) == typeof(String) && returnValue!=null)
             {
                 object o = returnValue.ToString();
@@ -290,6 +302,28 @@ namespace BrightstarDB.EntityFramework
             return (T) returnValue;
         }
 
+        private static bool IsNullableEnumGeneric(Type t)
+        {
+#if NETCORE
+            var typeInfo = t.GetTypeInfo();
+            if (!typeInfo.IsGenericType) return false;
+            var isGenericEnum = typeInfo.IsGenericTypeDefinition
+                ? typeInfo.GenericTypeParameters[0].GetTypeInfo().IsEnum
+                : typeInfo.GenericTypeArguments[0].IsEnum();
+            return isGenericEnum && t.IsNullable();
+#else
+            return t.IsNullable() && t.GetGenericArguments()[0].IsEnum;
+#endif
+        }
+
+        private static bool IsFlagsEnum(Type t)
+        {
+#if NETCORE
+            return t.GetTypeInfo().GetCustomAttributes<FlagsAttribute>(true).Any();
+#else
+            return t.GetCustomAttributes(typeof(FlagsAttribute), true).Any();
+#endif
+        }
         /// <summary>
         /// Updates the property of a domain object
         /// </summary>
@@ -527,7 +561,7 @@ namespace BrightstarDB.EntityFramework
 
         private static bool IsCollectionType (Type t)
         {
-            if(t.IsGenericType)
+            if(IsGenericType(t))
             {
                 var typeDef = t.GetGenericTypeDefinition();
                 var ret = typeDef.IsSubclassOf(typeof (ICollection<>)) || typeDef.Equals(typeof(ICollection<>));
@@ -538,7 +572,7 @@ namespace BrightstarDB.EntityFramework
 
         private static bool IsLiteralsCollection(Type t)
         {
-            if (t.IsGenericType)
+            if (IsGenericType(t))
             {
                 var typeDef = t.GetGenericTypeDefinition();
                 return typeDef.Equals(typeof(LiteralsCollection<>));
@@ -546,6 +580,14 @@ namespace BrightstarDB.EntityFramework
             return false;
         }
 
+        private static bool IsGenericType(Type t)
+        {
+#if NETCORE
+            return t.GetTypeInfo().IsGenericType;
+#else
+            return t.IsGenericType;
+#endif
+        }
         private BrightstarEntityObject ValidateAndAttach(object value, string propertyName)
         {
             if (value == null) return null;
@@ -842,7 +884,7 @@ namespace BrightstarDB.EntityFramework
             _context = null;
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Returns an new entity object bound to the same resource as this entity object
@@ -872,7 +914,7 @@ namespace BrightstarDB.EntityFramework
             _context.Unbecome<T>(this);
         }
 
-        #region Equality and HashCode overrides
+#region Equality and HashCode overrides
 
         /// <summary>
         /// Serves as a hash function for a particular type. 
@@ -898,7 +940,7 @@ namespace BrightstarDB.EntityFramework
             var other = obj as BrightstarEntityObject;
             return other != null && IsAttached && other.IsAttached && other.DataObject.Identity.Equals(DataObject.Identity);
         }
-        #endregion
+#endregion
 
         internal void UpdatePropertyCollection(string propertyName, BrightstarEntityObject objectToAdd, string identityToRemove)
         {

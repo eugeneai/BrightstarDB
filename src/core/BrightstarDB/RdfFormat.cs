@@ -112,7 +112,7 @@ namespace BrightstarDB
         public static RdfFormat GetResultsFormat(string resultsMediaTypeOrExtension)
         {
             var parts = resultsMediaTypeOrExtension.Split(';').Select(p => p.Trim()).ToList();
-#if PORTABLE
+#if PORTABLE || NETCORE
             var encodingName =
                 parts.Where(p => p.ToLowerInvariant().StartsWith("charset="))
                      .Select(p => p.Substring(8))

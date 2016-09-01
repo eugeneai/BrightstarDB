@@ -28,6 +28,24 @@ namespace BrightstarDB.Client
             Result = result;
         }
 
+#if PORTABLE
+        public static CachedQueryResult FromBinary(byte[] bytes)
+        {
+            var timestamp = DateTime.FromFileTimeUtc(BitConverter.ToInt64(bytes, 0));
+            var result = Encoding.UTF8.GetString(bytes, 8, bytes.Length - 8);
+            return new CachedQueryResult(timestamp, result);
+        }
+
+        public byte[] ToBinary()
+        {
+            var resultByteSize = Encoding.UTF8.GetByteCount(Result);
+            BitConverter.GetBytes(Timestamp.ToFileTimeUtc());
+            var buff = new byte[resultByteSize + 8];
+            Array.Copy(BitConverter.GetBytes(Timestamp.Ticks), buff, 8);
+            Encoding.UTF8.GetBytes(Result, 0, Result.Length, buff, 8);
+            return buff;
+        }
+#else
         /// <summary>
         /// Deserializes a byte array and recreates the original CachedQueryResult object
         /// </summary>
@@ -54,5 +72,6 @@ namespace BrightstarDB.Client
             Encoding.UTF8.GetBytes(Result, 0, Result.Length, buff, 8);
             return buff;
         }
+#endif
     }
 }

@@ -613,7 +613,11 @@ namespace BrightstarDB.EntityFramework.Query
             if (value == null) throw new ArgumentNullException("value");
             // Determine the effective expression type (removing Nullable<T> wrapper)
             var expressionType = value.GetType();
+#if NETCORE
+            if (expressionType.GetTypeInfo().IsGenericType && expressionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+#else
             if (expressionType.IsGenericType && expressionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+#endif
             {
                 expressionType = expressionType.GetGenericArguments()[0];
             }

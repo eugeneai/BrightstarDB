@@ -7,6 +7,9 @@ using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
 #elif WINDOWS_PHONE
 using BrightstarDB.Mobile.Compatibility;
+#elif NETCORE
+using BrightstarDB.Compatibility;
+using System.Collections.Concurrent;
 #else
 using System.Collections.Concurrent;
 #endif

@@ -29,7 +29,14 @@ namespace BrightstarDB.EntityFramework
         /// <filterpriority>1</filterpriority>
         public IEnumerator<NamespaceDeclarationAttribute> GetEnumerator()
         {
+#if NETCORE
+            return
+                _assembly.GetCustomAttributes(typeof(NamespaceDeclarationAttribute))
+                    .Cast<NamespaceDeclarationAttribute>()
+                    .GetEnumerator();
+#else
             return _assembly.GetCustomAttributes(typeof (NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().GetEnumerator();
+#endif
         }
 
         /// <summary>
@@ -55,7 +62,11 @@ namespace BrightstarDB.EntityFramework
         /// to format the colleciton of namespace declarations found in <paramref name="assembly"/>.</returns>
         public static NamespaceDeclarations ForAssembly(Assembly assembly = null)
         {
+#if NETCORE
+            if (assembly == null) assembly = typeof(NamespaceDeclarations).GetTypeInfo().Assembly;
+#else
             if (assembly == null) assembly = Assembly.GetCallingAssembly();
+#endif
             return new NamespaceDeclarations(assembly);
         }
 

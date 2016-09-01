@@ -1,4 +1,4 @@
-﻿#if !PORTABLE && !WINDOWS_PHONE
+﻿#if !PORTABLE && !WINDOWS_PHONE && !NETCORE
 using System;
 using System.Collections.Generic;
 using System.Configuration;

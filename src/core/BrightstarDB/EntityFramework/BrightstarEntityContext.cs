@@ -20,6 +20,9 @@ using SparqlResult = BrightstarDB.Client.SparqlResult;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.EntityFramework
 {
@@ -243,8 +246,13 @@ namespace BrightstarDB.EntityFramework
                     .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Where(
                         p =>
+#if NETCORE
+                            p.PropertyType.GetTypeInfo().IsGenericType &&
+                            p.PropertyType.Name.Equals("IEntitySet`1")))
+#else
                             p.PropertyType.IsGenericType &&
                             p.PropertyType.UnderlyingSystemType.Name.Equals("IEntitySet`1")))
+#endif
                 {
                     var entityType = p.PropertyType.GetGenericArguments()[0];
                     var entitySetInfo = new EntitySetInfo
@@ -264,7 +272,7 @@ namespace BrightstarDB.EntityFramework
             {
                 return;
             }
-#if SILVERLIGHT            
+#if SILVERLIGHT
             var service = new EmbeddedBrightstarService(connectionString.StoresDirectory);
 #else
             var service = BrightstarService.GetClient(connectionString.Value);
@@ -385,7 +393,7 @@ namespace BrightstarDB.EntityFramework
             _store.DetachDataObject(obj.DataObject);
         }
 
-        #region Overrides of EntityContext
+#region Overrides of EntityContext
 
         /// <summary>
         /// Commit local changes to the underlying store
@@ -488,7 +496,7 @@ namespace BrightstarDB.EntityFramework
             return _store.ExecuteSparql(sparqlQuery);
         }
 
-        #region Bindings
+#region Bindings
 
         private T BindDataObject<T>(IDataObject dataObject, Type bindType)
         {
@@ -622,7 +630,13 @@ namespace BrightstarDB.EntityFramework
                     var propertyType = propertyInfo.PropertyType;
                     var converter = GetStringConverter(propertyType);
                     if (converter == null) throw new EntityFrameworkException("No converter available for type '{0}'", propertyType.FullName);
+#if NETCORE
+                    object defaultValue = propertyType.GetTypeInfo().IsValueType
+                        ? Activator.CreateInstance(propertyType)
+                        : null;
+#else
                     object defaultValue = propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
+#endif
                     anonymousConstructorArgs.Add(new AnonymousConstructorArg
                     {
                         PropertyName = tuple.Item1,
@@ -663,7 +677,7 @@ namespace BrightstarDB.EntityFramework
             return lit?.Language;
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Executes a SPARQL query against the underlying store and binds the results to
@@ -847,12 +861,20 @@ namespace BrightstarDB.EntityFramework
 
         private static bool IsAnonymousType(Type type)
         {
+#if NETCORE
+            return type.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute)).Any()
+                   && type.IsGenericType() && type.Name.Contains("AnonymousType")
+                   && (type.Name.StartsWith("<>", StringComparison.OrdinalIgnoreCase) ||
+                       type.Name.StartsWith("VB$", StringComparison.OrdinalIgnoreCase))
+                   && (type.GetTypeInfo().Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
+#else
             // HACK: The only way to detect anonymous types right now.
             return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
                        && type.IsGenericType && type.Name.Contains("AnonymousType")
                        && (type.Name.StartsWith("<>", StringComparison.OrdinalIgnoreCase) ||
                            type.Name.StartsWith("VB$", StringComparison.OrdinalIgnoreCase))
                        && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
+#endif
         }
 
         /// <summary>
@@ -919,7 +941,7 @@ namespace BrightstarDB.EntityFramework
             _store.Dispose();
         }
 
-        #endregion
+#endregion
 
         ///<summary>
         /// Creates a new domain context object

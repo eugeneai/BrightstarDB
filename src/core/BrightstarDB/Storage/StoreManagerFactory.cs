@@ -35,6 +35,8 @@ namespace BrightstarDB.Storage
 #elif PORTABLE
             storeConfiguration.DisableBackgroundWrites = true;
             return new BPlusTreeStoreManager(storeConfiguration, PlatformAdapter.Resolve<IPersistenceManager>());
+#elif NETCORE
+            return new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new FilePersistenceManager());
 #else
             return storeConfiguration.UseIsolatedStorage ? new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new IsolatedStoragePersistanceManager()) : new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new FilePersistenceManager());
 #endif

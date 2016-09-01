@@ -75,7 +75,9 @@
     <Compile Include="Compatibility\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
-    <Compile Include="relinq\RelinqCore\**\*.cs" Exclude="relinq\RelinqCore\Properties\*.cs" />
+    <Compile Include="..\..\vendor\relinq\RelinqCore\**\*.cs" Exclude="..\..\vendor\relinq\RelinqCore\Properties\*.cs" >
+      <Link>relinq\%(recursivedir)\%(filename)</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">

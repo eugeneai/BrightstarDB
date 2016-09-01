@@ -7,6 +7,9 @@ using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Client
 {

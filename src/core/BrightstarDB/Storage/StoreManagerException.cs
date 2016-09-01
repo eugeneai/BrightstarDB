@@ -1,12 +1,12 @@
 ﻿using System;
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
 
 namespace BrightstarDB.Storage
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal abstract class StoreException : BrightstarException
@@ -17,7 +17,7 @@ namespace BrightstarDB.Storage
         }
     }
 
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal sealed class StoreManagerException : StoreException
@@ -32,7 +32,7 @@ namespace BrightstarDB.Storage
             Store = storeLocation;
         }
 
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -43,7 +43,7 @@ namespace BrightstarDB.Storage
     }
 
 
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal sealed class StoreReadException : StoreException

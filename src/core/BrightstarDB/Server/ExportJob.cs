@@ -6,6 +6,9 @@ using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 using System.Xml;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;

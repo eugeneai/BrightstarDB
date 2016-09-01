@@ -32,7 +32,7 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression is MemberExpression)
             {
                 var memberExpression = expression as MemberExpression;
-#if PORTABLE
+#if PORTABLE || NETCORE
                 if (memberExpression.Member is PropertyInfo)
 #else
                 if (memberExpression.Member.MemberType == MemberTypes.Property)
@@ -50,7 +50,7 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression is MemberExpression)
             {
                 var memberExpression = expression as MemberExpression;
-#if PORTABLE
+#if PORTABLE || NETCORE
                 return memberExpression.Member as PropertyInfo;
 #else
                 if (memberExpression.Member.MemberType == MemberTypes.Property)
@@ -163,6 +163,20 @@ namespace BrightstarDB.EntityFramework.Query
         protected string GetDatatype(Type systemType)
         {
             return QueryBuilder.Context.GetDatatype(systemType);
+        }
+
+        protected internal override Expression VisitExtensionExpression(ExtensionExpression expression)
+        {
+            if (expression is SelectVariableNameExpression)
+            {
+                return VisitSelectVariableNameExpression(expression as SelectVariableNameExpression);
+            }
+            return base.VisitExtensionExpression(expression);
+        }
+
+        protected virtual Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
+        {
+            return expression;
         }
     }
 }

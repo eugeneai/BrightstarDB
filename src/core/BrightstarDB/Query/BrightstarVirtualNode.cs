@@ -495,7 +495,7 @@ namespace BrightstarDB.Query
             return false;
         }
 
-#if !PORTABLE
+#if !PORTABLE && !NETCORE
         /// <summary>
         /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
         /// </summary>

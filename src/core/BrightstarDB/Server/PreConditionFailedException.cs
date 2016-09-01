@@ -4,7 +4,7 @@ using BrightstarDB.Dto;
 
 namespace BrightstarDB.Server
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal class PreconditionFailedException : BrightstarInternalException

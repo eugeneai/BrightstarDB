@@ -3,22 +3,37 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "dotNetRDF": "1.0.13-pre1",
-    "Remotion.Linq": "2.1.1",
-    "System.Runtime.Serialization.Formatters": "4.0.0-rc3-24212-01"
+    "dotNetRDF": "1.0.13-pre3",
+    "System.Diagnostics.TraceSource": "4.0.0",
+    "System.Diagnostics.TextWriterTraceListener": "4.0.0",
+    "System.Diagnostics.Tracing": "4.1.0",
+    "System.Threading.ThreadPool": "4.0.10",
+    "System.Linq.Queryable": "4.0.1",
+    "System.Reflection.Extensions": "4.0.1",
+    "System.Security.Cryptography.Algorithms": "4.2.0"  
   },
 
   "frameworks": {
-    "netstandard1.6": {
+    "netstandard1.4": {
     }
   },
 
+  "resource": [
+    "../../core/BrightstarDB/Strings.resx"
+  ],
+
   "buildOptions": {
     "compile": {
-      "include": [ "../../core/BrightstarDB/**/*.cs" ],
-      "exclude": ["../../core/BrightstarDB/OData/**/*.cs"]
+      "include": [ "../../core/BrightstarDB/**/*.cs", "../../vendor/relinq/RelinqCore/**/*.cs" ],
+      "exclude": [
+        "../../core/BrightstarDB/OData/**/*.cs",
+        "../../core/BrightstarDB/Analysis/**/*.cs",
+        "../../core/BrightstardB/Query/Processor/Obsolete/*.cs",
+        "../../vendor/relinq/RelinqCore/Properties/*.cs"
+      ]
     },
-    "define": ["NETCORE", "NETSTANDARD16"],
+    
+    "define": ["NETCORE", "NETSTANDARD14"],
     "outputName": "BrightstarDB"
   }
 }

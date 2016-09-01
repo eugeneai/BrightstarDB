@@ -39,7 +39,7 @@ namespace BrightstarDB
         /// <returns></returns>
         public override string ToString()
         {
-#if WINDOWS_PHONE || PORTABLE
+#if WINDOWS_PHONE || PORTABLE || NETCORE
             return MediaTypes[0] + "; charset=" + Encoding.WebName;
 #else
             return MediaTypes[0] + "; charset=" + Encoding.HeaderName;

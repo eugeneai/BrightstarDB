@@ -193,11 +193,20 @@ namespace BrightstarDB
 
         private static void Initialise(string logfileName, bool debugEnabled = false)
         {
+#if NETCORE
+            var traceOutputStream = System.IO.File.OpenWrite(logfileName);
+            var traceListener = new TextWriterTraceListener(traceOutputStream)
+            {
+                TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId,
+                Name = "Default"
+            };
+#else
             var traceListener = new TextWriterTraceListener(logfileName)
             {
                 TraceOutputOptions = TraceOptions.DateTime | TraceOptions.Timestamp | TraceOptions.ProcessId,
                 Name = "Default"
             };
+#endif
             Trace.AutoFlush = true;
             BrightstarTraceSource.Listeners.Add(traceListener);
             if (debugEnabled)
@@ -266,7 +275,11 @@ namespace BrightstarDB
         /// <param name="debugOn"></param>
         public static void EnableConsoleOutput(bool debugOn)
         {
+#if NETCORE
+            var consoleListener = new TextWriterTraceListener(System.Console.Out) {TraceOutputOptions= TraceOptions.DateTime};
+#else
             var consoleListener = new ConsoleTraceListener {TraceOutputOptions = TraceOptions.DateTime};
+#endif
             if (debugOn)
             {
                 BrightstarTraceSource.Switch.Level = SourceLevels.Verbose;
@@ -293,5 +306,5 @@ namespace BrightstarDB
         internal static bool IsProfilingEnabled { get; private set; }
 #endif
 
-    }
+        }
 }

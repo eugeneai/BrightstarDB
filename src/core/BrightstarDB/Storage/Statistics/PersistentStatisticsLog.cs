@@ -4,6 +4,9 @@ using System.IO;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.Statistics
 {

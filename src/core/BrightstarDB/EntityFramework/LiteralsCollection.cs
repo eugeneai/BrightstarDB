@@ -7,6 +7,7 @@ using BrightstarDB.Portable.Compatibility;
 using System.Collections.Specialized;
 #endif
 using System.Linq;
+using System.Reflection;
 using BrightstarDB.Client;
 
 namespace BrightstarDB.EntityFramework
@@ -83,7 +84,11 @@ namespace BrightstarDB.EntityFramework
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public void Add(T item)
         {
+#if NETCORE
+            if (!typeof(T).GetTypeInfo().IsValueType && item == null) throw new ArgumentNullException(nameof(item));
+#else
             if (!typeof(T).IsValueType && item == null) throw new ArgumentNullException("item");
+#endif
             if (_isAttached)
             {
                 _beo.DataObject.AddProperty(_propertyTypeUri, item);

@@ -16,7 +16,7 @@ using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 using VDS.RDF.Query;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 using System.ServiceModel;
 #endif
 
@@ -150,7 +150,7 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if SILVERLIGHT || PORTABLE
+#if SILVERLIGHT || PORTABLE || NETCORE
                                 Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
 #else
                                 Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );

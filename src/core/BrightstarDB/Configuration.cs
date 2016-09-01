@@ -4,7 +4,9 @@ using System.IO;
 using BrightstarDB.Caching;
 using BrightstarDB.Config;
 using BrightstarDB.Storage;
+#if !NETCORE
 using System.Configuration;
+#endif
 
 #if SILVERLIGHT
 using System.IO.IsolatedStorage;
@@ -68,133 +70,6 @@ namespace BrightstarDB
         private const int DefaultResourceCacheLimit = 1000000; // number of entries
 #endif
 
-        static Configuration()
-        {
-            IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
-#if WINDOWS_PHONE
-            var store = IsolatedStorageFile.GetUserStoreForApplication();
-            if (!store.DirectoryExists("brightstar"))
-            {
-                store.CreateDirectory("brightstar");
-            }
-            StoreLocation = "brightstar";
-            TransactionFlushTripleCount = 1000;
-            QueryCache = new NullCache();
-#elif PORTABLE
-            StoreLocation = "brightstar";
-            TransactionFlushTripleCount = 1000;
-            PageCacheSize = DefaultPageCacheSize;
-            ResourceCacheLimit = DefaultResourceCacheLimit;
-            EnableOptimisticLocking = false;
-            EnableQueryCache = false;
-            PersistenceType = DefaultPersistenceType;
-            QueryCache = new NullCache();
-#else
-            var appSettings = ConfigurationManager.AppSettings;
-            StoreLocation = appSettings.Get(StoreLocationPropertyName);
-
-            // Transaction Flushing
-            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
-
-            // Read Store cache
-            // TODO : Remove this if it is no longer in use.
-            var readStoreObjectCacheSizeString = appSettings.Get(ReadStoreObjectCacheSizeName);
-            ReadStoreObjectCacheSize = 10000;
-            if (!string.IsNullOrEmpty(readStoreObjectCacheSizeString))
-            {
-                int val;
-                if (int.TryParse(readStoreObjectCacheSizeString, out val))
-                {
-                    if (val > 0)
-                    {
-                        ReadStoreObjectCacheSize = val;
-                    }
-                }
-            }
-
-            // Connection String
-            ConnectionString = appSettings.Get(ConnectionStringPropertyName);
-
-            // Query Caching
-            var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
-            EnableQueryCache = true;
-            if (!string.IsNullOrEmpty(enableQueryCacheString))
-            {
-                EnableQueryCache = bool.Parse(enableQueryCacheString);
-            }
-            QueryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
-            QueryCacheDiskSpace = GetApplicationSetting(QueryCacheDiskSpaceName, DefaultQueryCacheDiskSpace);
-            QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
-            QueryCache = GetQueryCache();
-
-            // Virtualized queries
-            EnableVirtualizedQueries = GetApplicationSetting(EnableVirtualizedQueriesName, false);
-
-            // StatsUpdate properties
-            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
-            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
-
-            // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            EmbeddedServiceConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration ??
-                                           new EmbeddedServiceConfiguration();
-
-#endif
-#if !PORTABLE
-            // ResourceCacheLimit
-            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
-
-            // Persistence Type
-            var persistenceTypeSetting = GetApplicationSetting(PersistenceTypeName);
-            if (!String.IsNullOrEmpty(persistenceTypeSetting))
-            {
-                switch (persistenceTypeSetting.ToLowerInvariant())
-                {
-                    case PersistenceTypeAppendOnly:
-                        PersistenceType = PersistenceType.AppendOnly;
-                        break;
-                    case PersistenceTypeRewrite:
-                        PersistenceType = PersistenceType.Rewrite;
-                        break;
-                    default:
-                        PersistenceType = DefaultPersistenceType;
-                        break;
-                }
-            }
-            else
-            {
-                PersistenceType = DefaultPersistenceType;
-            }
-
-            // Page Cache Size
-            var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
-            int pageCacheSize;
-            if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
-            {
-                PageCacheSize = pageCacheSize;
-            }
-            else
-            {
-                PageCacheSize = DefaultPageCacheSize;
-            }
-
-#if !WINDOWS_PHONE
-            // Clustering
-            var clusterNodePortSetting = GetApplicationSetting(ClusterNodePortName);
-            int clusterNodePort;
-            if (!String.IsNullOrEmpty(clusterNodePortSetting) &&
-                Int32.TryParse(clusterNodePortSetting, out clusterNodePort))
-            {
-                ClusterNodePort = clusterNodePort;
-            }
-            else
-            {
-                ClusterNodePort = 10001;
-            }
-#endif
-#endif
-            QueryExecutionTimeout = GetApplicationSetting(QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
-            UpdateExecutionTimeout = GetApplicationSetting(UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
-        }
 
         /// <summary>
         /// Default path to the directory containing BrightstarDB stores
@@ -347,6 +222,139 @@ namespace BrightstarDB
         /// </summary>
         public static bool IsRunningOnMono { get; private set; }
 
+        static Configuration()
+        {
+            IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
+#if WINDOWS_PHONE
+            var store = IsolatedStorageFile.GetUserStoreForApplication();
+            if (!store.DirectoryExists("brightstar"))
+            {
+                store.CreateDirectory("brightstar");
+            }
+            StoreLocation = "brightstar";
+            TransactionFlushTripleCount = 1000;
+            QueryCache = new NullCache();
+#elif PORTABLE || NETCORE
+#if PORTABLE
+            StoreLocation = "brightstar";
+#endif
+            TransactionFlushTripleCount = 1000;
+            PageCacheSize = DefaultPageCacheSize;
+            ResourceCacheLimit = DefaultResourceCacheLimit;
+            EnableOptimisticLocking = false;
+            EnableQueryCache = false;
+            PersistenceType = DefaultPersistenceType;
+            QueryCache = new NullCache();
+            QueryExecutionTimeout = DefaultQueryExecutionTimeout;
+            UpdateExecutionTimeout = DefaultUpdateExecutionTimeout;
+#else
+            var appSettings = ConfigurationManager.AppSettings;
+            StoreLocation = appSettings.Get(StoreLocationPropertyName);
+
+            // Transaction Flushing
+            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
+
+            // Read Store cache
+            // TODO : Remove this if it is no longer in use.
+            var readStoreObjectCacheSizeString = appSettings.Get(ReadStoreObjectCacheSizeName);
+            ReadStoreObjectCacheSize = 10000;
+            if (!string.IsNullOrEmpty(readStoreObjectCacheSizeString))
+            {
+                int val;
+                if (int.TryParse(readStoreObjectCacheSizeString, out val))
+                {
+                    if (val > 0)
+                    {
+                        ReadStoreObjectCacheSize = val;
+                    }
+                }
+            }
+
+            // Connection String
+            ConnectionString = appSettings.Get(ConnectionStringPropertyName);
+
+            // Query Caching
+            var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
+            EnableQueryCache = true;
+            if (!string.IsNullOrEmpty(enableQueryCacheString))
+            {
+                EnableQueryCache = bool.Parse(enableQueryCacheString);
+            }
+            QueryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
+            QueryCacheDiskSpace = GetApplicationSetting(QueryCacheDiskSpaceName, DefaultQueryCacheDiskSpace);
+            QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
+            QueryCache = GetQueryCache();
+
+            // Virtualized queries
+            EnableVirtualizedQueries = GetApplicationSetting(EnableVirtualizedQueriesName, false);
+
+            // StatsUpdate properties
+            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
+            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+
+            // Advanced embedded application settings - read from the brightstar section of the app/web.config
+            EmbeddedServiceConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration ??
+                                           new EmbeddedServiceConfiguration();
+
+#endif
+#if !PORTABLE && !NETCORE
+            // ResourceCacheLimit
+            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
+
+            // Persistence Type
+            var persistenceTypeSetting = GetApplicationSetting(PersistenceTypeName);
+            if (!String.IsNullOrEmpty(persistenceTypeSetting))
+            {
+                switch (persistenceTypeSetting.ToLowerInvariant())
+                {
+                    case PersistenceTypeAppendOnly:
+                        PersistenceType = PersistenceType.AppendOnly;
+                        break;
+                    case PersistenceTypeRewrite:
+                        PersistenceType = PersistenceType.Rewrite;
+                        break;
+                    default:
+                        PersistenceType = DefaultPersistenceType;
+                        break;
+                }
+            }
+            else
+            {
+                PersistenceType = DefaultPersistenceType;
+            }
+
+            // Page Cache Size
+            var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
+            int pageCacheSize;
+            if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
+            {
+                PageCacheSize = pageCacheSize;
+            }
+            else
+            {
+                PageCacheSize = DefaultPageCacheSize;
+            }
+
+#if !WINDOWS_PHONE
+            // Clustering
+            var clusterNodePortSetting = GetApplicationSetting(ClusterNodePortName);
+            int clusterNodePort;
+            if (!String.IsNullOrEmpty(clusterNodePortSetting) &&
+                Int32.TryParse(clusterNodePortSetting, out clusterNodePort))
+            {
+                ClusterNodePort = clusterNodePort;
+            }
+            else
+            {
+                ClusterNodePort = 10001;
+            }
+#endif
+            QueryExecutionTimeout = GetApplicationSetting(QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
+            UpdateExecutionTimeout = GetApplicationSetting(UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
+#endif
+        }
+
+
         /// <summary>
         /// Get or set the SPARQL query execution timeout (in milliseconds)
         /// </summary>
@@ -401,7 +409,7 @@ namespace BrightstarDB
         }
 #endif
 
-#if !PORTABLE
+#if !PORTABLE && !NETCORE
         private static string GetApplicationSetting(string key)
         {
 #if WINDOWS_PHONE

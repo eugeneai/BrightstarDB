@@ -5,6 +5,9 @@ using System.Linq;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
+#if NETCORE
+using BrightstarDB.Compatibility;
+#endif
 using BrightstarDB.Profiling;
 
 namespace BrightstarDB.Storage.Persistence

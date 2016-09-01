@@ -8,7 +8,7 @@ using BrightstarDB.Storage;
 using VDS.RDF;
 using VDS.RDF.Parsing.Tokens;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 using System.ServiceModel;
 #endif
 
@@ -176,7 +176,7 @@ namespace BrightstarDB.Server
         {
             Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
             var fileExtension = MimeTypesHelper.GetTrueFileExtension(fileName);
-#if PORTABLE
+#if PORTABLE || NETCORE
             bool isGZiped =
                 fileExtension.ToLowerInvariant().EndsWith(MimeTypesHelper.DefaultGZipExtension.ToLowerInvariant());
 #else
