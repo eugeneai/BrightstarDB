@@ -241,6 +241,7 @@ namespace BrightstarDB.EntityFramework
 #if NETCORE
             return t.GetTypeInfo().GetCustomAttributes<EntityAttribute>(true);
 #else
+            return t.GetCustomAttributes(typeof(EntityAttribute), true).OfType<EntityAttribute>();
 #endif
         }
 
@@ -414,6 +415,7 @@ namespace BrightstarDB.EntityFramework
 #if NETCORE
             return assembly.GetCustomAttributes<NamespaceDeclarationAttribute>();
 #else
+            return assembly.GetCustomAttributes(typeof(NamespaceDeclarationAttribute), false).OfType<NamespaceDeclarationAttribute>();
 #endif
         }
 
