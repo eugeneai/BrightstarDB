@@ -3,7 +3,7 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "dotNetRDF": "1.0.13-pre3",
+    "dotNetRDF": "1.0.13-*",
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Diagnostics.TextWriterTraceListener": "4.0.0",
     "System.Diagnostics.Tracing": "4.1.0",
@@ -15,12 +15,9 @@
 
   "frameworks": {
     "netstandard1.4": {
-    }
+    },
+    "netstandard1.5": {} 
   },
-
-  "resource": [
-    "../../core/BrightstarDB/Strings.resx"
-  ],
 
   "buildOptions": {
     "compile": {
@@ -32,6 +29,9 @@
         "../../vendor/relinq/RelinqCore/Properties/*.cs"
       ]
     },
+    "embed": [
+      "../../core/BrightstarDB/Strings.resx"
+    ],
     
     "define": ["NETCORE", "NETSTANDARD14"],
     "outputName": "BrightstarDB"
