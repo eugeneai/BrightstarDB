@@ -11,12 +11,12 @@ namespace BrightstarDB.Tests
 
         public static string StoreLocation
         {
-            get { return "BrightstarDB"; }
+            get { return "bin\\BrightstarDB"; }
         }
 
         public static string DataLocation
         {
-            get { return System.IO.Path.GetFullPath("..\\..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"); }
+            get { return System.IO.Path.GetFullPath("..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"); }
         }
 #else
         public static string StoreLocation
