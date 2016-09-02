@@ -8,8 +8,6 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    //[TestFixture("type=embedded;StoresDirectory={1};storeName={2}")]
-    //[TestFixture("type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty")]
     public class LinqTests
     {
         private readonly string _connectionStringTemplate;
@@ -17,11 +15,6 @@ namespace BrightstarDB.Tests.EntityFramework
         public LinqTests()
         {
             _connectionStringTemplate = "type=embedded;StoresDirectory={1};storeName={2}";
-        }
-
-        public LinqTests(string connectionStringTemplate)
-        {
-            _connectionStringTemplate = connectionStringTemplate;
         }
 
         private string GetConnectionString(string testName)
