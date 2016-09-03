@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Remotion.Linq.Utilities;
 
@@ -103,8 +104,7 @@ namespace Remotion.Linq.Parsing.Structure.NodeTypeProviders
 
                 // find corresponding method on the generic type definition
 #if NETCORE
-          return declaringTypeDefinition.GetMethod(genericMethodDefinition.Name,
-              genericMethodDefinition.GetParameters().Select(p => p.ParameterType).ToArray());
+          return FindGenericMethod(method); 
 #else
                 return (MethodInfo) MethodBase.GetMethodFromHandle (genericMethodDefinition.MethodHandle, declaringTypeDefinition.TypeHandle);
 #endif
@@ -115,7 +115,50 @@ namespace Remotion.Linq.Parsing.Structure.NodeTypeProviders
       }
     }
 
-    private readonly Dictionary<MethodInfo, Type> _registeredMethodInfoTypes = new Dictionary<MethodInfo, Type>();
+#if NETCORE
+        private static MethodInfo FindGenericMethod(MethodInfo method)
+      {
+          var declaringType = method.DeclaringType;
+          var declaringTypeInfo = declaringType.GetTypeInfo();
+          var declaringTypeDefinition = declaringTypeInfo.GetGenericTypeDefinition();
+          var declaringTypeDefinitionInfo = declaringTypeDefinition.GetTypeInfo();
+          var typeParameters = declaringTypeDefinitionInfo.GenericTypeParameters;
+          var typeArguments = declaringTypeInfo.GenericTypeArguments;
+          var methodParameters = method.GetParameters();
+
+          foreach (var m in declaringTypeDefinition.GetMethods().Where(m => m.Name.Equals(method.Name)))
+          {
+              var genericMethodParameters = m.GetParameters();
+                if (!methodParameters.Length.Equals(genericMethodParameters.Length)) continue;
+                if (!GenericTypeMatch(m.ReturnType, method.ReturnType, typeParameters, typeArguments)) continue;
+              var parametersMatch = true;
+              for (var i = 0; i < methodParameters.Length && parametersMatch; i++)
+              {
+                  parametersMatch &= GenericTypeMatch(genericMethodParameters[i].ParameterType,
+                      methodParameters[i].ParameterType, typeParameters, typeArguments);
+              }
+              if (parametersMatch) return m;
+          }
+          return null;
+      }
+
+      private static bool GenericTypeMatch(Type genericType, Type declaredType, Type[] genericTypeParameters,
+          Type[] genericTypeArguments)
+      {
+          if (genericType.IsGenericParameter)
+          {
+              var typeIx = Array.IndexOf(genericTypeParameters, genericType);
+              var typeArgument = genericTypeArguments[typeIx];
+              return typeArgument.Equals(declaredType);
+          }
+          else
+          {
+              return genericType.Equals(declaredType);
+          }
+      }
+#endif
+
+        private readonly Dictionary<MethodInfo, Type> _registeredMethodInfoTypes = new Dictionary<MethodInfo, Type>();
 
     /// <summary>
     /// Returns the count of the registered <see cref="MethodInfo"/>s.
