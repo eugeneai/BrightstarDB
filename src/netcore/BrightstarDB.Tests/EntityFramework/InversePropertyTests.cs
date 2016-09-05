@@ -2,13 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    public class InversePropertyTests
+    [Collection("BrightstarService")]
+    public class InversePropertyTests : IDisposable
     {
-        private readonly string _connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=InversePropertyTests_" + DateTime.Now.Ticks;
+        private readonly string _connectionString;
+
+        public InversePropertyTests()
+        {
+            _connectionString = $"Type=embedded;StoresDirectory={Configuration.StoreLocation};StoreName=InversePropertyTests_" + DateTime.Now.Ticks;
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
+        }
 
         [Fact]
         public void TestAddOne()

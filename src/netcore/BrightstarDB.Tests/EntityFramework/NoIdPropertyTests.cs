@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class NoIdPropertyTests
+    [Collection("BrightstarService")]
+    public class NoIdPropertyTests : IDisposable
     {
         private readonly string _storeName;
 
@@ -19,6 +20,11 @@ namespace BrightstarDB.Tests.EntityFramework
         private MyEntityContext GetContext()
         {
             return new MyEntityContext("type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName);
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

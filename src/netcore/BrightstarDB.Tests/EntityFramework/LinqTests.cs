@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    public class LinqTests
+    [Collection("BrightstarService")]
+    public class LinqTests : IDisposable
     {
         private readonly string _connectionStringTemplate;
 
@@ -20,10 +20,14 @@ namespace BrightstarDB.Tests.EntityFramework
         private string GetConnectionString(string testName)
         {
             return string.Format(_connectionStringTemplate,
-                //Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation),
                 Configuration.DataLocation,
                 Configuration.StoreLocation,
                 testName + "_" + DateTime.Now.Ticks);
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

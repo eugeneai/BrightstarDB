@@ -10,8 +10,8 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class PlainLiteralTests
+    [Collection("BrightstarService")]
+    public class PlainLiteralTests: IDisposable
     {
         private IDataObjectContext _dataObjectContext;
 
@@ -24,6 +24,11 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             var connectionString = new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation);
             _dataObjectContext = new EmbeddedDataObjectContext(connectionString);
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

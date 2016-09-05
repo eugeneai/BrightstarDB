@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Linq;
-using BrightstarDB.EntityFramework;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class QueryableCollectionsTests
+    [Collection("BrightstarService")]
+    public class QueryableCollectionsTests : IDisposable
     {
-        private const string ConnectionString = "type=embedded;StoresDirectory=c:\\brightstar;";
-
         private readonly MyEntityContext _context;
         private readonly IDepartment _dept;
 
         public QueryableCollectionsTests()
         {
-            var connectionString = ConnectionString + "StoreName=SimpleCollectionFilter_" + DateTime.UtcNow.Ticks;
+            var connectionString = $"type=embedded;StoresDirectory={Configuration.StoreLocation};StoreName=SimpleCollectionFilter_{DateTime.UtcNow.Ticks}";
             _context = new MyEntityContext(connectionString);
             var gardening = _context.Skills.Create();
             gardening.Name = "Gardening";
@@ -46,8 +44,6 @@ namespace BrightstarDB.Tests.EntityFramework
         [Fact]
         public void TestSimpleCollectionFilter()
         {
-            
-
             // If we look for all people whose name starts with A (using context as starting point), we get two results
             var queryResult = _context.Persons.Where(p => p.Name.StartsWith("A")).ToList();
             Assert.Equal(2, queryResult.Count);
@@ -71,6 +67,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void Dispose()
         {
             _context.Dispose();
+            BrightstarService.Shutdown(false);
         }
     }
 }

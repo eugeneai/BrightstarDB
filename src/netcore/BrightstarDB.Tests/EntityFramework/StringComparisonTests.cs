@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class StringComparisonTests
+    [Collection("BrightstarService")]
+    public class StringComparisonTests : IDisposable
     {
         private MyEntityContext _context;
 
@@ -137,6 +138,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void Dispose()
         {
             _context.Dispose();
+            BrightstarService.Shutdown(false);
         }
     }
 }

@@ -1,19 +1,25 @@
 ﻿using System;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class EmbeddedOptimisticLockingTests : OptimisticLockingTestsBase
+    [Collection("BrightstarService")]
+    public class EmbeddedOptimisticLockingTests : OptimisticLockingTestsBase, IDisposable
     {
-        private const string TestStoreLocation = "c:\\brightstar";
         private readonly string _storeName = "EmbeddedOptimisticLockingTests_" + DateTime.Now.Ticks;
 
         protected override MyEntityContext NewContext()
         {
             return new MyEntityContext(
-                String.Format("type=embedded;storesDirectory={0};storeName={1};optimisticLocking=true", TestStoreLocation, _storeName));
+                String.Format("type=embedded;storesDirectory={0};storeName={1};optimisticLocking=true", Configuration.StoreLocation, _storeName));
         }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
+        }
+
 
         #region SingleObjectRefres
         [Fact]

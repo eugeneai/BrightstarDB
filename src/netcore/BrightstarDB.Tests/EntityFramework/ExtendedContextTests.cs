@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class ExtendedContextTests
+    [Collection("BrightstarService")]
+    public class ExtendedContextTests : IDisposable
     {
         private readonly string _storeName;
 
         public ExtendedContextTests()
         {
-            _storeName = Guid.NewGuid().ToString();
+            _storeName = "ExtendedContextTests" + Guid.NewGuid();
             using (var context = GetContext())
             {
                 // Put in data
@@ -35,6 +36,11 @@ namespace BrightstarDB.Tests.EntityFramework
                 context.Companies.Add(cac);
                 context.SaveChanges();
             }
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         private MyEntityContext GetContext()

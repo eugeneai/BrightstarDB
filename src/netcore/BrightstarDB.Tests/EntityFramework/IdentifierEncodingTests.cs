@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Linq;
-using BrightstarDB.EntityFramework;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
+    [Collection("BrightstarService")]
     public class IdentifierEncodingTests : IDisposable
     {
-        private MyEntityContext _myEntityContext;
+        private readonly MyEntityContext _myEntityContext;
 
         private readonly string _connectionString =
-            "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=IdentifierEncodingTests_" + DateTime.Now.Ticks;
+            $"Type=embedded;StoresDirectory={Configuration.StoreLocation};StoreName=IdentifierEncodingTests_{DateTime.Now.Ticks}";
 
         public IdentifierEncodingTests()
         {
@@ -21,6 +21,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TearDown()
         {
             _myEntityContext.Dispose();
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

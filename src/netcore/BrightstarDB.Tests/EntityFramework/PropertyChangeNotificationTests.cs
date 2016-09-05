@@ -4,15 +4,15 @@ using System.ComponentModel;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class PropertyChangeNotificationTests
+    [Collection("BrightstarService")]
+    public class PropertyChangeNotificationTests : IDisposable
     {
         private readonly MyEntityContext _context;
-        private readonly string _storeName;
         private readonly ICompany _company;
         private readonly IMarket _ftse;
         private readonly IMarket _nyse;
@@ -22,8 +22,8 @@ namespace BrightstarDB.Tests.EntityFramework
 
         public PropertyChangeNotificationTests()
         {
-            _storeName = "PropertyChangeNotificationTests_" + DateTime.UtcNow.Ticks;
-            _context = new MyEntityContext("type=embedded;storesDirectory=c:\\brightstar;storeName="+_storeName);
+            var storeName = "PropertyChangeNotificationTests_" + DateTime.UtcNow.Ticks;
+            _context = new MyEntityContext($"type=embedded;storesDirectory={Configuration.StoreLocation};storeName={storeName}");
             _ftse = _context.Markets.Create();
             _nyse = _context.Markets.Create();
             _company = _context.Companies.Create();
@@ -161,6 +161,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void Dispose()
         {
             _context.Dispose();
+            BrightstarService.Shutdown(false);
         }
     }
 }

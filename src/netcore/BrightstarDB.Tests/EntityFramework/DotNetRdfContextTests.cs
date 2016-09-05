@@ -5,7 +5,7 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
+    [Collection("BrightstarService")]
     public class DotNetRdfContextTests
     {
 #if PORTABLE || NETCORE

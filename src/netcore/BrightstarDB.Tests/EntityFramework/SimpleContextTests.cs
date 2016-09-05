@@ -17,14 +17,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class SimpleContextTests
+    [Collection("BrightstarService")]
+    public class SimpleContextTests : IDisposable
     {
         private readonly IDataObjectContext _dataObjectContext;
         public SimpleContextTests()
         {
             var connectionString = new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation);
             _dataObjectContext = new EmbeddedDataObjectContext(connectionString);
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]
@@ -170,24 +175,6 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-
-        [Fact(Skip="Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
-        public void TestCannotCreateEntityWithKey()
-        {
-            string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
-            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
-            {
-                using (var context = new MyEntityContext(dataObjectStore))
-                {
-                    Assert.Throws<EntityKeyRequiredException>(() =>
-                    {
-                        // Should throw an exception as the Name property is required to generate the key
-                        context.StringKeyEntities.Create();
-                        context.SaveChanges();
-                    });
-                }
-            }
-        }
 
         [Fact]
         public void TestAddOrUpdateWithGeneratedId()

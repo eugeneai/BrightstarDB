@@ -7,17 +7,16 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class EntityFrameworkGraphTargetingTests
+    [Collection("BrightstarService")]
+    public class EntityFrameworkGraphTargetingTests : IDisposable
     {
-        private const string TestStoreLocation = "c:\\brightstar";
         private readonly string _storeName = "EntityFrameworkGraphTargetingTests_" + DateTime.Now.Ticks;
 
         private MyEntityContext NewContext(bool optimisticLocking, string updateGraph = null, IEnumerable<string> datasetGraphs = null, string versioningGraph = null )
         {
             var connectionString =
                 String.Format("type=embedded;storesDirectory={0};storeName={1}",
-                              TestStoreLocation, _storeName);
+                              Configuration.StoreLocation, _storeName);
             return new MyEntityContext(connectionString, optimisticLocking, updateGraph, datasetGraphs, versioningGraph);
         }
 
@@ -25,9 +24,14 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             var connectionString =
                 String.Format("type=embedded;storesDirectory={0};storeName={1}",
-                              TestStoreLocation, _storeName);
+                              Configuration.StoreLocation, _storeName);
             return BrightstarService.GetClient(connectionString);
         }
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
+        }
+
 
         [Fact]
         public void TestCreateInNamedGraph()

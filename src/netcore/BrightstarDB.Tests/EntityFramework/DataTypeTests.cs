@@ -1,24 +1,31 @@
 ﻿using System;
 using System.Linq;
+using BrightstarDB.Client;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class DataTypeTests
+    [Collection("BrightstarService")]
+    public class DataTypeTests : IDisposable
     {
         private MyEntityContext _myEntityContext;
 
-        private readonly string _connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=" + Guid.NewGuid();
+        private readonly string _connectionString;
 
         public DataTypeTests()
         {
+            _connectionString = $"Type=embedded;StoresDirectory={Configuration.StoreLocation};StoreName=DataTypeTests{DateTime.Now.Ticks}";
             SetUp();
         }
 
         private void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

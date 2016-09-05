@@ -7,16 +7,21 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    public class ContextCallbackTests
+    [Collection("BrightstarService")]
+    public class ContextCallbackTests : IDisposable
     {
-        private readonly string _storeName;
         private readonly string _connectionString;
         private readonly List<BrightstarEntityObject> _changedItems = new List<BrightstarEntityObject>();
  
         public ContextCallbackTests()
         {
-            _storeName = "EFContextCallbackTests_" + DateTime.Now.Ticks;
-            _connectionString = "type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName;
+            var storeName = "EFContextCallbackTests_" + DateTime.Now.Ticks;
+            _connectionString = "type=embedded;storesDirectory=c:\\brightstar;storeName=" + storeName;
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         [Fact]

@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class GeneratedKeyTests
+    [Collection("BrightstarService")]
+    public class GeneratedKeyTests : IDisposable
     {
         private readonly string _storeName;
 
         public GeneratedKeyTests()
         {
             _storeName = "GeneratedKeyTests_" + DateTime.Now.Ticks;
+        }
+
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
         }
 
         private MyEntityContext GetContext()

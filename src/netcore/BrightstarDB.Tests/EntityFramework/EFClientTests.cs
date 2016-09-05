@@ -6,9 +6,14 @@ using Xunit;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    
-    public class EFClientTests
+    [Collection("BrightstarService")]
+    public class EFClientTests : IDisposable
     {
+        public void Dispose()
+        {
+            BrightstarService.Shutdown(false);
+        }
+
         [Fact]
         public void TestEmbeddedClientMapToRdf()
         {
