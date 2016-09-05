@@ -3,9 +3,9 @@
   "testRunner": "xunit",
 
   "dependencies": {
-    "xunit": "2.2.0-beta3-build3342",
-    "xunit.runner.console": "2.2.0-beta3-build3342",
-    "dotnet-test-xunit": "2.2.0-preview3-build1039",
+    "xunit": "2.2.0-beta3-*",
+    "xunit.runner.console": "2.2.0-beta3-*",
+    "dotnet-test-xunit": "2.2.0-preview3-*",
     "BrightstarDB": "1.14.0-*"
   },
 
