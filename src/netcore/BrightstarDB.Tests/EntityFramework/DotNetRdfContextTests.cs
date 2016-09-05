@@ -8,9 +8,10 @@ namespace BrightstarDB.Tests.EntityFramework
     
     public class DotNetRdfContextTests
     {
+#if PORTABLE || NETCORE
+        [Fact(Skip="DotNetRDF PCL/Portable does not support loading files into store configuration")]
+#else
         [Fact]
-#if PORTABLE
-        [Ignore("DotNetRDF PCL does not support loading files into store configuration")]
 #endif
         public void TestInitializeWithStoreConfiguration()
         {
