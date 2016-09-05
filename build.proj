@@ -4,6 +4,7 @@
 	<!-- NoPortable: Set true to disable all PCL builds. Defaults to True on non-Windows platforms -->
 	<NoPortable Condition=" '$(OS)' != 'Windows_NT' ">True</NoPortable>
 	<NoPortable Condition=" '$(OS)' == 'Windows_NT' ">False</NoPortable>
+	<NoNetCore Condition=" '$(NoNetCore)' == ''">False</NoNetCore>
         <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
         <NoiOS Condition=" '$(NoiOS)' == '' ">False</NoiOS>
         <NUnitVersion>2.6.4</NUnitVersion>
@@ -69,6 +70,13 @@
         <Copy SourceFiles="@(StoreARMLib)" DestinationFolder="build\sdk\pcl_ARM"/>
         <Copy SourceFiles="@(Storex86Lib)" DestinationFolder="build\sdk\pcl_x86"/>
     </Target>
+	
+	<Target Name="BuildNetCore" DependsOnTargets="CompileNetCore" Condition="!(NoNetCore)">
+		<ItemGroup>
+			<NetCoreLibs Include="src/netcore/BrightstarDB/bin/$(Configuration)/**/*.dll"/>
+		</ItemGroup>
+		<Copy SourceFiles="@NetCoreLibs" DestinationFiles="@(NetCoreLibs->'build\sdk\netcore\%(RecursiveDir)\%(Filename)%(Extension)')" />
+	</Target>
     
     <Target Name="BuildTools" DependsOnTargets="CompileTools" Condition=" '$(OS)' != 'Unix' ">
         <ItemGroup>
@@ -121,6 +129,24 @@
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean"/>
     </Target>
+	
+	<Target Name="RestoreNetCore" Condition="!$(NoNetCore)">
+		<Exec Command="dotnet restore" 
+		      WorkingDirectory="src\netcore\BrightstarDB" />
+			  
+		<!-- Currently this restore generates a lot of spurious error messages that we suppress here -->
+		<Exec Command="dotnet restore" 
+		      WorkingDirectory="src\netcore\BrightstarDB.Tests"  
+			  IgnoreExitCode="True" 
+			  IgnoreStandardErrorWarningFormat="True"/>
+	</Target>
+   
+   <Target Name="CompileNetCore" Condition="!$(NoNetCore)" DependsOnTargets="RestoreNetCore">
+		<Exec Command="dotnet build --configuration=$(Configuration) --no-dependencies --no-incremental" 
+		      WorkingDirectory="src\netcore\BrightstarDB" />
+		<Exec Command="dotnet build --configuration=$(Configuration) --no-dependencies --no-incremental" 
+		      WorkingDirectory="src\netcore\BrightstarDB.Tests" />
+   </Target>
    
     <Target Name="CompilePortable" Condition="!$(NoPortable)"
 	    DependsOnTargets="CompilePortableCore;
