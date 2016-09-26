@@ -207,7 +207,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Query("query", SparqlQueryString);
                     with.Accept(SparqlXml);
                     with.Header("If-Modified-Since", DateTime.Now.ToUniversalTime().ToString("r"));
-                });
+                }).Result;
             
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotModified));
@@ -232,7 +232,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
                 with.Header("If-Modified-Since", DateTime.Now.ToUniversalTime().ToString("r"));
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotModified));
@@ -262,7 +262,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Query("query", SparqlQueryString);
                     with.Accept(SparqlXml);
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString(), Is.EqualTo("mock results"));
@@ -282,7 +282,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("query", SparqlQueryString);
                 with.Accept(SparqlXml);
-            });
+            }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             brightstar.Verify();
@@ -311,7 +311,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -332,7 +332,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -352,7 +352,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("query", SparqlQueryString);
                 with.Accept(SparqlXml);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -371,7 +371,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -384,7 +384,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo/sparql", with => with.Accept(new MediaRange("text/html")));
+            var response = app.Get("/foo/sparql", with => with.Accept(new MediaRange("text/html"))).Result;
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString().Contains("<form method=\"POST\">"));
         }
@@ -406,7 +406,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Query("query", SparqlQueryString);
                 with.Accept(SparqlXml);
                 with.Header("Origin", "http://example.com/");
-            });
+            }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             Assert.That(response.Headers["Access-Control-Allow-Origin"], Is.EqualTo("*"));
@@ -451,7 +451,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     }
                 }
                 with.Accept(accept);
-            });
+            }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
          
@@ -496,7 +496,7 @@ namespace BrightstarDB.Server.Modules.Tests
                         }
                     }
                     with.Accept(accept);
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             if (formats == null)
@@ -537,7 +537,7 @@ namespace BrightstarDB.Server.Modules.Tests
                         }
                     }
                     with.Accept(accept);
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(accept.Matches(new MediaRange(response.ContentType)));
@@ -576,7 +576,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     }
                 }
                 with.Accept(accept);
-            });
+            }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(accept.Matches(new MediaRange(response.ContentType)));

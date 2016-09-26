@@ -12,7 +12,11 @@
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
+****************************
+Develop
+****************************
 
+	- NEW: Introduction of a build targeting .NET Core. The 
 
 ****************************
  BrightstarDB 1.13

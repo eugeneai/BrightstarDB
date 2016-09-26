@@ -1,4 +1,4 @@
-﻿using Nancy.Security;
+﻿using System.Security.Claims;
 
 namespace BrightstarDB.Server.Modules.Permissions
 {
@@ -17,15 +17,15 @@ namespace BrightstarDB.Server.Modules.Permissions
             _second = second;
         }
 
-        public override SystemPermissions GetPermissionsForUser(IUserIdentity user)
+        public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal principal)
         {
-            return _first.GetPermissionsForUser(user) | _second.GetPermissionsForUser(user);
+            return _first.GetPermissionsForUser(principal) | _second.GetPermissionsForUser(principal);
         }
 
-        public override bool HasPermissions(IUserIdentity user, SystemPermissions requestedPermissions)
+        public override bool HasPermissions(ClaimsPrincipal principal, SystemPermissions requestedPermissions)
         {
-            return _first.HasPermissions(user, requestedPermissions) ||
-                   _second.HasPermissions(user, requestedPermissions);
+            return _first.HasPermissions(principal, requestedPermissions) ||
+                   _second.HasPermissions(principal, requestedPermissions);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace BrightstarDB.Server.Modules
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read, delete:StorePermissions.Admin);
 
-            Get["/{storeName}"] = parameters =>
+            Get("/{storeName}", parameters =>
             {
                 var storeName = parameters["storeName"];
                 ViewBag.Title = storeName;
@@ -30,19 +30,19 @@ namespace BrightstarDB.Server.Modules
                             .WithModel(new StoreResponseModel(parameters["storeName"]));
                 }
                 return new StoreResponseModel(parameters["storeName"]);
-            };
+            });
 
-            Delete["/{storeName}"] = parameters =>
+            Delete("/{storeName}", parameters =>
+            {
+                var storeName = parameters["storeName"];
+                ViewBag.Title = "Deleted - " + storeName;
+                if (brightstarService.DoesStoreExist(storeName))
                 {
-                    var storeName = parameters["storeName"];
-                    ViewBag.Title = "Deleted - " + storeName;
-                    if (brightstarService.DoesStoreExist(storeName))
-                    {
-                        brightstarService.DeleteStore(storeName);
-                    }
-                    return Negotiate.WithMediaRangeModel(new MediaRange("text/html"), 
-                                                         new StoreDeletedModel {StoreName = storeName});
-                };
+                    brightstarService.DeleteStore(storeName);
+                }
+                return Negotiate.WithMediaRangeModel(new MediaRange("text/html"),
+                    new StoreDeletedModel {StoreName = storeName});
+            });
         }
     }
 }

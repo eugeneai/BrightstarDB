@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
@@ -33,7 +34,7 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             var app = new Browser(bootstrapper);
 
             var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
 
             permissions.VerifyAll();
             userValidator.VerifyAll();
@@ -46,13 +47,13 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             var permissions = new Mock<AbstractSystemPermissionsProvider>();
             permissions.Setup(
                 p =>
-                p.HasPermissions(It.Is<IUserIdentity>(x => x != null && x.UserName.Equals("alice")), SystemPermissions.ListStores))
-                       .Returns(true);
+                p.HasPermissions(It.Is<ClaimsPrincipal>(x => x != null && x.FindFirst(ClaimTypes.Name).Value.Equals("alice")), SystemPermissions.ListStores))
+                       .Returns(true).Verifiable();
             var userValidator = new Mock<IUserValidator>();
             userValidator.Setup(v => v.Validate("alice", "password"))
-                         .Returns(new MockUserIdentity("alice", new string[0]));
+                         .Returns(new MockUserIdentity("alice", new string[0])).Verifiable();
             var mockBrightstar = new Mock<IBrightstarService>();
-            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]).Verifiable();
             var bootstrapper = new FakeNancyBootstrapper(mockBrightstar.Object, new BasicAuthAuthenticationProvider(new BasicAuthenticationConfiguration(userValidator.Object, "test")),
                                                 new FallbackStorePermissionsProvider(StorePermissions.All),
                                                 permissions.Object);
@@ -63,11 +64,12 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
                 c.BasicAuth("alice", "password");
                 c.Accept(new MediaRange("application/json"));
             });
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-
             permissions.VerifyAll();
             userValidator.VerifyAll();
             mockBrightstar.VerifyAll();
+
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
         }
 
         [Test]
@@ -76,11 +78,11 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             var permissions = new Mock<AbstractSystemPermissionsProvider>();
             permissions.Setup(
                 p =>
-                p.HasPermissions(It.Is<IUserIdentity>(x => x != null && x.UserName.Equals("alice")), SystemPermissions.ListStores))
+                p.HasPermissions(It.Is<ClaimsPrincipal>(x => x != null && x.FindFirst(ClaimTypes.Name).Value.Equals("alice")), SystemPermissions.ListStores))
                        .Returns(true);
             var userValidator = new Mock<IUserValidator>();
             userValidator.Setup(v => v.Validate("alice", "invalidpassword"))
-                         .Returns((IUserIdentity)null);
+                         .Returns((ClaimsPrincipal)null);
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
             var bootstrapper = new FakeNancyBootstrapper(mockBrightstar.Object, new BasicAuthAuthenticationProvider(new BasicAuthenticationConfiguration(userValidator.Object, "test")),
@@ -93,11 +95,11 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
                 c.BasicAuth("alice", "invalidpassword");
                 c.Accept(new MediaRange("application/json"));
             });
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
 
             userValidator.VerifyAll();
             permissions.Verify(x=>x.HasPermissions(null, SystemPermissions.ListStores), Times.Once());
-            permissions.Verify(x=>x.HasPermissions(It.IsNotNull<IUserIdentity>(), SystemPermissions.ListStores), Times.Never());
+            permissions.Verify(x=>x.HasPermissions(It.IsNotNull<ClaimsPrincipal>(), SystemPermissions.ListStores), Times.Never());
             mockBrightstar.Verify(x => x.ListStores(), Times.Never());
             
         }

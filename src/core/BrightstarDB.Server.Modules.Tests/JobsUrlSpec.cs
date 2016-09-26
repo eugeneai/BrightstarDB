@@ -35,7 +35,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -66,7 +66,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -89,7 +89,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -122,7 +122,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -145,7 +145,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -168,7 +168,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -202,7 +202,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -268,7 +268,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -311,7 +311,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -481,7 +481,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.GetJobInfo("foo", 0, 11)).Returns(MockJobInfo(11)).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs", with => with.Accept(Json));
+            var response = app.Get("/foo/jobs", with => with.Accept(Json)).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var jobs = response.Body.DeserializeJson<List<JobResponseModel>>();
@@ -517,7 +517,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 mockJob.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075", with => with.Accept(Json));
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075", with => with.Accept(Json)).Result;
             
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -540,7 +540,7 @@ namespace BrightstarDB.Server.Modules.Tests
                       .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075");
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075").Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -560,7 +560,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(jobRequest);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -577,7 +577,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -596,7 +596,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -618,7 +618,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
-                });
+                }).Result;
             
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));

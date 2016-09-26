@@ -6,7 +6,7 @@ namespace BrightstarDB.Server.Modules
     {
         public DocumentationModule()
         {
-            Get["/documentation"] = parameters => View["documentation.sshtml"];
+            Get("/documentation", parameters => View["documentation.sshtml"]);
         }
     }
 }

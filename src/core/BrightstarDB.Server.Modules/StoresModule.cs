@@ -17,53 +17,53 @@ namespace BrightstarDB.Server.Modules
         {
             this.RequiresBrightstarSystemPermission(systemPermissionsProvider, get:SystemPermissions.ListStores, post:SystemPermissions.CreateStore);
 
-            Get["/"] = parameters =>
+            Get("/", parameters =>
             {
                 ViewBag.Title = "Stores";
                 var stores = brightstarService.ListStores();
                 return
                     Negotiate.WithModel(new StoresResponseModel
-                        {
-                            Stores = stores.ToList()
-                        });
-                };
+                    {
+                        Stores = stores.ToList()
+                    });
+            });
 
-            Post["/"] = parameters =>
+            Post("/", parameters =>
+            {
+                ViewBag.Title = "Stores";
+                var request = this.Bind<CreateStoreRequestObject>();
+                if (request == null || String.IsNullOrEmpty(request.StoreName))
                 {
-                    ViewBag.Title = "Stores";
-                    var request = this.Bind<CreateStoreRequestObject>();
-                    if (request == null || String.IsNullOrEmpty(request.StoreName))
-                    {
-                        return HttpStatusCode.BadRequest;
-                    }
+                    return HttpStatusCode.BadRequest;
+                }
 
-                    // Return 409 Conflict if attempt to create a store with a name that is currently in use
-                    if (brightstarService.DoesStoreExist(request.StoreName))
-                    {
-                        return HttpStatusCode.Conflict;
-                    }
+                // Return 409 Conflict if attempt to create a store with a name that is currently in use
+                if (brightstarService.DoesStoreExist(request.StoreName))
+                {
+                    return HttpStatusCode.Conflict;
+                }
 
-                    // Attempt to create the store
-                    try
+                // Attempt to create the store
+                try
+                {
+                    PersistenceType? storePersistenceType = request.GetBrightstarPersistenceType();
+                    if (storePersistenceType.HasValue)
                     {
-                        PersistenceType? storePersistenceType = request.GetBrightstarPersistenceType();
-                        if (storePersistenceType.HasValue)
-                        {
-                            brightstarService.CreateStore(request.StoreName, storePersistenceType.Value);
-                        }
-                        else
-                        {
-                            brightstarService.CreateStore(request.StoreName);
-                        }
+                        brightstarService.CreateStore(request.StoreName, storePersistenceType.Value);
                     }
-                    catch (ArgumentException)
+                    else
                     {
-                        return HttpStatusCode.BadRequest;   
+                        brightstarService.CreateStore(request.StoreName);
                     }
-                    return
-                        Negotiate.WithModel(new StoreResponseModel(request.StoreName))
-                                 .WithStatusCode(HttpStatusCode.Created);
-                };
+                }
+                catch (ArgumentException)
+                {
+                    return HttpStatusCode.BadRequest;
+                }
+                return
+                    Negotiate.WithModel(new StoreResponseModel(request.StoreName))
+                        .WithStatusCode(HttpStatusCode.Created);
+            });
         }
     }
 }

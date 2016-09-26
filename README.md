@@ -16,6 +16,22 @@ To get started with BrightstarDB you may want to check out the following resourc
 If you want a binary installer that includes BrightstarDB, the BrightstarDB service and the Polaris management tool, 
 please get them from our [Codeplex project homepage](http://brightstardb.codeplex.com/)
 
+Building
+--------
+
+## Important!
+
+Currently several of our dependent projects are in their .NET Core pre-release phase. This means that the
+current develop branch build of BrightstarDB is relying on some project's nightly builds at MyGet rather 
+than on their "official" NuGet.org packages.
+
+To build BrightstarDB you will need to add the following additional NuGet feeds:
+
+NancyFx: https://www.myget.org/F/nancyfx/api/v3/index.json
+
+XUnit: https://www.myget.org/F/xunit/api/v3/index.json
+
+
 Licensing
 ---------
 

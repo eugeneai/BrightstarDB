@@ -30,7 +30,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s=>s.DoesStoreExist("foo")).Returns(true).Verifiable();
             brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(graphs).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Get("/foo/graphs", with => with.Accept(SparqlXml));
+            var response = app.Get("/foo/graphs", with => with.Accept(SparqlXml)).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -50,7 +50,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true).Verifiable();
             brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(graphs).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Get("/foo/graphs", with => with.Accept("application/json"));
+            var response = app.Get("/foo/graphs", with => with.Accept("application/json")).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -79,7 +79,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("graph", "http://example.org/g");
                 with.Accept(RdfXml);
-            });
+            }).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -99,7 +99,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("graph", "http://example.org/g");
                 with.Accept(RdfXml);
-            });
+            }).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -117,7 +117,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("graph", "g");
                 with.Accept(RdfXml);
-            });
+            }).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -139,7 +139,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Query("default", "");
                 with.Accept(RdfXml);
-            });
+            }).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -167,7 +167,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Query("default", "");
                 with.Accept(RdfXml);
                 with.Header("If-Modified-Since", DateTime.UtcNow.ToString("r"));
-            });
+            }).Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotModified));
@@ -204,7 +204,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Query("graph", "http://example.org/g");
                 with.Header("Content-Type", RdfFormat.NTriples.MediaTypes.First());
                 with.Body("<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
-            });
+            }).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
             brightstar.Verify();
@@ -229,7 +229,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Query("graph", "http://example.org/g");
                 with.Header("Content-Type", RdfFormat.NTriples.MediaTypes.First());
                 with.Body("<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
-            });
+            }).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
             brightstar.Verify();
@@ -252,7 +252,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Query("default", "");
                 with.Header("Content-Type", RdfFormat.NTriples.MediaTypes.First());
                 with.Body("<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
-            });
+            }).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
             brightstar.Verify();
@@ -264,7 +264,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             brightstar.Setup(s=>s.DoesStoreExist("foo")).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g"));
+            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g")).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             brightstar.Verify();
@@ -278,7 +278,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true).Verifiable();
             brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(graphs).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g"));
+            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g")).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             brightstar.Verify();
@@ -296,7 +296,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s=>s.ExecuteUpdate("foo", "DROP GRAPH <http://example.org/g1>", true, "Drop Graph http://example.org/g1"))
                 .Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g1"));
+            var response = app.Delete("foo/graphs", with => with.Query("graph", "http://example.org/g1")).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
             brightstar.Verify();
@@ -314,7 +314,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.ExecuteUpdate("foo", "DROP DEFAULT", true, "Drop Default Graph"))
                 .Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var response = app.Delete("foo/graphs", with => with.Query("default", ""));
+            var response = app.Delete("foo/graphs", with => with.Query("default", "")).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
             brightstar.Verify();

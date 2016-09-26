@@ -5,6 +5,7 @@ using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Configuration;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Configuration;
 using Nancy.Responses;
 using Nancy.Responses.Negotiation;
 
@@ -12,7 +13,7 @@ namespace BrightstarDB.Server.Modules
 {
     public static class CorsPipelinesExtension
     {
-        public static void EnableCors(this IPipelines pipelines, CorsConfiguration corsConfiguration)
+        public static void EnableCors(this IPipelines pipelines, CorsConfiguration corsConfiguration, INancyEnvironment environment)
         {
             pipelines.AfterRequest.AddItemToEndOfPipeline(ctx =>
             {
@@ -30,8 +31,8 @@ namespace BrightstarDB.Server.Modules
                 if (ctx.Request.Headers.Accept.Any(x => x.Item1.ToLowerInvariant().Contains("application/json")))
                 {
                     // Return the exception detail as JSON
-                    response = new JsonResponse(new ExceptionDetailObject(exception),
-                        new DefaultJsonSerializer()) {StatusCode = HttpStatusCode.InternalServerError};
+                    response = new JsonResponse(new ExceptionDetailObject(exception), 
+                        new DefaultJsonSerializer(environment), environment) {StatusCode = HttpStatusCode.InternalServerError};
                 }
                 else
                 {

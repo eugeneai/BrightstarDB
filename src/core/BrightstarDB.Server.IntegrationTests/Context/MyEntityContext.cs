@@ -23,6 +23,20 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	
     	static MyEntityContext() 
     	{
+            InitializeEntityMappingStore();
+        }
+        
+        /// <summary>
+        /// Initialize the internal cache of entity attribute information.
+        /// </summary>
+        /// <remarks>
+        /// This method is normally invoked from the static constructor for the generated context class.
+        /// It is provided as a public static method to enable the use of the cached entity attribute 
+        /// information without the need to construct a context (typically in test code). 
+        /// In normal application code you should never need to explicitly call this method.
+        /// </remarks>
+        public static void InitializeEntityMappingStore()
+        {
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IAnimal));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IAnimal, BrightstarDB.Server.IntegrationTests.Context.Animal>();
@@ -182,6 +196,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class Animal : BrightstarEntityObject, IAnimal 
     {
     	public Animal(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Animal(BrightstarEntityContext context) : base(context, typeof(Animal)) { }
     	public Animal() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IAnimal
@@ -206,6 +221,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
     	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Department(BrightstarEntityContext context) : base(context, typeof(Department)) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IDepartment
@@ -235,6 +251,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class FoafAgent : BrightstarEntityObject, IFoafAgent 
     {
     	public FoafAgent(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public FoafAgent(BrightstarEntityContext context) : base(context, typeof(FoafAgent)) { }
     	public FoafAgent() : base() { }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafAgent
     	public System.Collections.Generic.ICollection<System.String> MboxSums
@@ -251,6 +268,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
     {
     	public FoafPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public FoafPerson(BrightstarEntityContext context) : base(context, typeof(FoafPerson)) { }
     	public FoafPerson() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafPerson
@@ -314,6 +332,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
     	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public JobRole(BrightstarEntityContext context) : base(context, typeof(JobRole)) { }
     	public JobRole() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IJobRole
@@ -337,6 +356,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class Person : BrightstarEntityObject, IPerson 
     {
     	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Person(BrightstarEntityContext context) : base(context, typeof(Person)) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IPerson
@@ -430,6 +450,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
     	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Skill(BrightstarEntityContext context) : base(context, typeof(Skill)) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.ISkill

@@ -44,10 +44,10 @@ namespace BrightstarDB.Server.Modules
         public Response Process(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
             var graphListModel = model as GraphListModel;
-            if (graphListModel == null) throw new ArgumentException("Unexpected model type: " + model.GetType(), "model");
-            return new JsonResponse(graphListModel.Graphs, new DefaultJsonSerializer());
+            if (graphListModel == null) throw new ArgumentException("Unexpected model type: " + model.GetType(), nameof(model));
+            return new JsonResponse(graphListModel.Graphs, new DefaultJsonSerializer(context.Environment), context.Environment);
         }
 
-        public IEnumerable<Tuple<string, MediaRange>> ExtensionMappings { get {return GraphListExtensionMappings;} }
+        public IEnumerable<Tuple<string, MediaRange>> ExtensionMappings => GraphListExtensionMappings;
     }
 }

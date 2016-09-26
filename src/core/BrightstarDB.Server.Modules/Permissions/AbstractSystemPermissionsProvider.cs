@@ -1,14 +1,15 @@
-﻿using Nancy.Security;
+﻿using System.Security.Claims;
+using Nancy.Security;
 
 namespace BrightstarDB.Server.Modules.Permissions
 {
     public abstract class AbstractSystemPermissionsProvider
     {
-        public abstract SystemPermissions GetPermissionsForUser(IUserIdentity user);
+        public abstract SystemPermissions GetPermissionsForUser(ClaimsPrincipal principal);
 
-        public virtual bool HasPermissions(IUserIdentity user, SystemPermissions requestedPermissions)
+        public virtual bool HasPermissions(ClaimsPrincipal principal, SystemPermissions requestedPermissions)
         {
-            return (GetPermissionsForUser(user) & requestedPermissions) == requestedPermissions;
+            return (GetPermissionsForUser(principal) & requestedPermissions) == requestedPermissions;
         }
     }
 }

@@ -12,6 +12,7 @@ using BrightstarDB.Server.Modules.Permissions;
 using NUnit.Framework;
 using Nancy.Authentication.Basic;
 using Nancy.Security;
+using System.Security.Claims;
 
 namespace BrightstarDB.Server.IntegrationTests
 {
@@ -176,7 +177,7 @@ namespace BrightstarDB.Server.IntegrationTests
             _passwords = new Dictionary<string, string>(passwords);
         }
 
-        public IUserIdentity Validate(string username, string password)
+        ClaimsPrincipal IUserValidator.Validate(string username, string password)
         {
             string pwd;
             return _passwords.TryGetValue(username, out pwd) && pwd.Equals(password)
@@ -185,16 +186,11 @@ namespace BrightstarDB.Server.IntegrationTests
         }
     }
 
-    internal class StaticUserIdentity : IUserIdentity
+    internal class StaticUserIdentity : ClaimsPrincipal
     {
-        public StaticUserIdentity(string userName)
+        public StaticUserIdentity(string userName) : base(new ClaimsIdentity(new Claim[] {new Claim(ClaimTypes.Name, userName)}))
         {
-            UserName = userName;
-            Claims = new string[0];
         }
-
-        public string UserName { get; private set; }
-        public IEnumerable<string> Claims { get; private set; }
     }
 
 }

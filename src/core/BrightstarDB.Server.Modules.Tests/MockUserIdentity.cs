@@ -1,25 +1,16 @@
 ﻿using System.Collections.Generic;
-using Nancy.Security;
+using System.Linq;
+using System.Security.Claims;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
-    public class MockUserIdentity : IUserIdentity
+    public class MockUserIdentity : ClaimsPrincipal
     {
-        private readonly string _name;
-        private readonly string[] _claims;
-
         public MockUserIdentity(string userName, string[] claims)
         {
-            _name = userName;
-            _claims = claims;
+            var allClaims = new List<Claim> {new Claim(ClaimTypes.Name, userName)};
+            allClaims.AddRange(claims.Select(c=>new Claim(c, c)));
+            AddIdentity(new ClaimsIdentity(allClaims));
         }
-
-
-        public string UserName
-        {
-            get { return _name; }
-        }
-
-        public IEnumerable<string> Claims { get { return _claims; } }
     }
 }

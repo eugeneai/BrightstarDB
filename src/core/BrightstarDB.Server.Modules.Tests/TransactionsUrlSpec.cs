@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
-            var response = browser.Get("/foo/transactions", with => with.Accept(Json));
+            var response = browser.Get("/foo/transactions", with => with.Accept(Json)).Result;
             
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var transactionList = response.Body.DeserializeJson<List<TransactionResponseModel>>();
@@ -49,7 +49,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(Json);
                     with.Query("skip", "10");
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var transactionList = response.Body.DeserializeJson<List<TransactionResponseModel>>();
@@ -77,7 +77,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
-            var response = browser.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json));
+            var response = browser.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json)).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var transaction = response.Body.DeserializeJson<TransactionResponseModel>();
@@ -102,7 +102,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
-            var response = browser.Get("/foo/transactions", with => with.Accept(Json));
+            var response = browser.Get("/foo/transactions", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -128,7 +128,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
-            var response = app.Get("/foo/transactions", with => with.Accept(Json));
+            var response = app.Get("/foo/transactions", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -144,7 +144,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
-            var response = app.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json));
+            var response = app.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

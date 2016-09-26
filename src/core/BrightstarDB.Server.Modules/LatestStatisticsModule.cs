@@ -11,12 +11,12 @@ namespace BrightstarDB.Server.Modules
         public LatestStatisticsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read);
-            Get["/{storeName}/statistics/latest"] = parameters =>
-                {
-                    var latest = brightstarService.GetStatistics(parameters["storeName"]);
-                    if (latest == null) return HttpStatusCode.NotFound;
-                    return MakeResponseModel(latest);
-                };
+            Get("/{storeName}/statistics/latest", parameters =>
+            {
+                var latest = brightstarService.GetStatistics(parameters["storeName"]);
+                if (latest == null) return HttpStatusCode.NotFound;
+                return MakeResponseModel(latest);
+            });
         }
 
         private static StatisticsResponseModel MakeResponseModel(IStoreStatistics stats)

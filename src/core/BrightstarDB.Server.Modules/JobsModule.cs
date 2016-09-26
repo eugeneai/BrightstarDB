@@ -7,7 +7,6 @@ using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Nancy;
 using Nancy.ModelBinding;
-using Nancy.Responses;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -18,47 +17,44 @@ namespace BrightstarDB.Server.Modules
         {
             this.RequiresBrightstarStorePermissionData(permissionsProvider);
 
-            Get["/{storeName}/jobs"] = parameters =>
+            Get("/{storeName}/jobs", parameters =>
+            {
+                var jobsRequestObject = this.Bind<JobsRequestModel>();
+                if (jobsRequestObject?.StoreName == null)
                 {
-                    var jobsRequestObject = this.Bind<JobsRequestModel>();
-                    ViewBag.Title = jobsRequestObject.StoreName + " - Jobs";
-                    if (jobsRequestObject == null || jobsRequestObject.StoreName == null)
-                    {
-                        return HttpStatusCode.BadRequest;
-                    }
-                    if (jobsRequestObject.Take <= 0) jobsRequestObject.Take = DefaultPageSize;
-                    var jobs = brightstarService.GetJobInfo(jobsRequestObject.StoreName, jobsRequestObject.Skip,
-                                                            jobsRequestObject.Take + 1);
-                    return Negotiate.WithPagedList(jobsRequestObject,
-                                                   jobs.Select(j=>j.MakeResponseObject(jobsRequestObject.StoreName)),
-                                                   jobsRequestObject.Skip, jobsRequestObject.Take, DefaultPageSize,
-                                                   "jobs");
-                };
+                    return HttpStatusCode.BadRequest;
+                }
+                ViewBag.Title = jobsRequestObject.StoreName + " - Jobs";
+                if (jobsRequestObject.Take <= 0) jobsRequestObject.Take = DefaultPageSize;
+                var jobs = brightstarService.GetJobInfo(jobsRequestObject.StoreName, jobsRequestObject.Skip,
+                    jobsRequestObject.Take + 1);
+                return Negotiate.WithPagedList(jobsRequestObject,
+                    jobs.Select(j => j.MakeResponseObject(jobsRequestObject.StoreName)),
+                    jobsRequestObject.Skip, jobsRequestObject.Take, DefaultPageSize,
+                    "jobs");
+            });
 
-            Get["/{storeName}/jobs/{jobId}"] = parameters =>
+            Get("/{storeName}/jobs/{jobId}", parameters =>
+            {
+                var request = this.Bind<JobRequestModel>();
+                if (request?.StoreName == null || request.JobId == null)
                 {
-                    var request = this.Bind<JobRequestModel>();
-                    if (request == null ||
-                        request.StoreName == null ||
-                        request.JobId == null)
-                    {
-                        return HttpStatusCode.BadRequest;
-                    }
-                    ViewBag.Title = request.StoreName + " - Job - " + request.JobId;
-                    var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
-                    if (job == null) return HttpStatusCode.NotFound;
-                    var responseDto = job.MakeResponseObject(request.StoreName);
-                    return responseDto;
-                };
+                    return HttpStatusCode.BadRequest;
+                }
+                ViewBag.Title = request.StoreName + " - Job - " + request.JobId;
+                var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
+                if (job == null) return HttpStatusCode.NotFound;
+                var responseDto = job.MakeResponseObject(request.StoreName);
+                return responseDto;
+            });
 
-            Post["/{storeName}/jobs"] = parameters =>
+            Post("/{storeName}/jobs", parameters =>
                 {
                     var jobRequestObject = this.Bind<JobRequestObject>();
-                    ViewBag.Title = jobRequestObject.StoreName + "- Jobs";
                     // Validate
-                    if (jobRequestObject == null) return HttpStatusCode.BadRequest;
-                    if (String.IsNullOrWhiteSpace(jobRequestObject.JobType)) return HttpStatusCode.BadRequest;
+                    if (string.IsNullOrWhiteSpace(jobRequestObject?.JobType)) return HttpStatusCode.BadRequest;
 
+                    ViewBag.Title = jobRequestObject.StoreName + "- Jobs";
                     var storeName = parameters["storeName"];
                     var label = jobRequestObject.Label;
                     try
@@ -244,7 +240,7 @@ namespace BrightstarDB.Server.Modules
                         return HttpStatusCode.Unauthorized;
                     }
 
-                };
+                });
         }
 
         

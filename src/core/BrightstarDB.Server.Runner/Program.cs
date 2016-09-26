@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Hosting.Self;
 
@@ -66,7 +67,8 @@ namespace BrightstarDB.Server.Runner
                     var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
                     var baseUris = serviceArgs.BaseUris.Select(x => x.EndsWith("/") ? new Uri(x) : new Uri(x + "/")).ToArray();
                     var nancyHost = new NancyHost(bootstrapper, new HostConfiguration {AllowChunkedEncoding = false}, baseUris);
-                    Nancy.StaticConfiguration.DisableErrorTraces = !serviceArgs.ShowErrorTraces;
+                    var nancyEnvironment = bootstrapper.GetEnvironment();
+                    nancyEnvironment.Tracing(displayErrorTraces: serviceArgs.ShowErrorTraces, enabled:true);
                     nancyHost.Start();
 					Console.WriteLine("BrightstarDB Service is running. Hit Enter to stop the service.");
                     Console.ReadLine();

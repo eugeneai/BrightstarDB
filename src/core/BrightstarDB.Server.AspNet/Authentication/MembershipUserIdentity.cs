@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Web.Security;
-using Nancy.Security;
 
 namespace BrightstarDB.Server.AspNet.Authentication
 {
-    public class MembershipUserIdentity : IUserIdentity
+    public class MembershipUserIdentity : ClaimsPrincipal
     {
         private readonly MembershipUser _user;
         private readonly string[] _roles;
@@ -19,14 +19,16 @@ namespace BrightstarDB.Server.AspNet.Authentication
             }
         }
 
-        public string UserName
-        {
-            get { return _user.UserName; }
-        }
+        public string UserName => _user.UserName;
 
-        public IEnumerable<string> Claims 
+        public override IEnumerable<Claim> Claims 
         {
-            get { return _roles; }
+            get
+            {
+                return
+                    (new Claim[] {new Claim(ClaimTypes.Name, UserName)})
+                        .Union(_roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            }
         }
 
     }

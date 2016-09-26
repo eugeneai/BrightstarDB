@@ -23,7 +23,7 @@ namespace BrightstarDB.Server.Modules
             this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.Read, post:StorePermissions.Read);
             _brightstar = brightstarService;
 
-            Get["/{storeName}/sparql"] = parameters =>
+            Get("/{storeName}/sparql", parameters =>
             {
                 ViewBag.Title = "SPARQL";
                 try
@@ -37,8 +37,9 @@ namespace BrightstarDB.Server.Modules
                     r.StatusCode = HttpStatusCode.BadRequest;
                     return r;
                 }
-            };
-            Post["/{storeName}/sparql"] = parameters =>
+            });
+
+            Post("/{storeName}/sparql",  parameters =>
             {
                 ViewBag.Title = "SPARQL";
                 try
@@ -52,17 +53,17 @@ namespace BrightstarDB.Server.Modules
                     r.StatusCode = HttpStatusCode.BadRequest;
                     return r;
                 }
-            };
-            Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
-            Post["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
+            });
+            Get("/{storeName}/commits/{commitId}/sparql", parameters => ProcessCommitPointQuery(parameters));
+            Post("/{storeName}/commits/{commitId}/sparql", parameters => ProcessCommitPointQuery(parameters));
         }
 
-        private object ProcessCommitPointQuery(dynamic parameters)
+        private dynamic ProcessCommitPointQuery(dynamic parameters)
         {
             ViewBag.Title = "SPARQL";
             var requestObject = BindSparqlRequestObject();
             ulong c;
-            if (UInt64.TryParse(parameters["commitId"], out c))
+            if (ulong.TryParse(parameters["commitId"], out c))
             {
                 return
                     Negotiate.WithModel(new SparqlQueryProcessingModel(parameters["storeName"], c, _brightstar,
