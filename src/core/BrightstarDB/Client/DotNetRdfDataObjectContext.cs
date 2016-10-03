@@ -171,11 +171,7 @@ namespace BrightstarDB.Client
 #elif NETCORE
         private static IGraph LoadConfiguration(string configurationPath)
         {
-            ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
-            using (var stream = System.IO.File.OpenRead(configurationPath))
-            {
-                return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
-            }
+            return DotNetRdfConfigurationHelper.LoadConfiguration(configurationPath);
         }
 #else
         private static IGraph LoadConfiguration(string configurationPath)

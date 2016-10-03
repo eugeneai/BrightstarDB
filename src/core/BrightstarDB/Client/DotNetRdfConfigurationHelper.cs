@@ -26,10 +26,7 @@ namespace BrightstarDB.Client
         {
             var pm = new FilePersistenceManager();
             ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
-            using (var stream = pm.GetInputStream(configurationPath))
-            {
-                return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
-            }
+            return ConfigurationLoader.LoadConfiguration(configurationPath);
         }
 #else
         public static IGraph LoadConfiguration(string configurationPath)
