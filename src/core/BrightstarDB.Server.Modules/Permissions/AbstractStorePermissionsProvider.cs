@@ -14,7 +14,7 @@ namespace BrightstarDB.Server.Modules.Permissions
         public virtual bool HasStorePermission(ClaimsPrincipal userIdentity, string storeName,
                                        StorePermissions permissionRequested)
         {
-            return (GetStorePermissions(principal, storeName) & permissionRequested) == permissionRequested;
+            return (GetStorePermissions(userIdentity, storeName) & permissionRequested) == permissionRequested;
         }
 
         /// <summary>

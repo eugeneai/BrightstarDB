@@ -453,10 +453,10 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Accept(accept);
             }).Result;
 
-            Assert.That(response.Result.StatusCode, Is.EqualTo(expectedStatusCode));
+            Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
          
             brightstar.Verify();
-            return response.Result;
+            return response;
         }
 
         private static BrowserResponse TestGetSucceeds(

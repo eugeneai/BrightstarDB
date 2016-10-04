@@ -64,7 +64,7 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             userValidator.VerifyAll();
             mockBrightstar.VerifyAll();
 
-            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
         }
 

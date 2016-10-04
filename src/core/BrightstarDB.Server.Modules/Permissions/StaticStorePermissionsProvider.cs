@@ -89,7 +89,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
         }
 
-        public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
+        public override StorePermissions GetStorePermissions(ClaimsPrincipal principal, string storeName)
         {
             if (principal == null || !principal.IsAuthenticated())
             {
@@ -97,7 +97,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
 
             var calculatedPermissions = StorePermissions.None;
-            var userName = currentUser.FindFirst(ClaimTypes.Name)?.Value;
+            var userName = principal.FindFirst(ClaimTypes.Name)?.Value;
             if (!string.IsNullOrEmpty(userName))
             {
                 // See if there are user-specific permissions
@@ -115,7 +115,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             Dictionary<string, StorePermissions> storeClaimPermissions;
             if (_storeClaims.TryGetValue(storeName, out storeClaimPermissions))
             {
-                foreach (var roleClaim in currentUser.FindAll(ClaimTypes.Role))
+                foreach (var roleClaim in principal.FindAll(ClaimTypes.Role))
                 {
                     StorePermissions claimPermissions;
                     if (storeClaimPermissions.TryGetValue(roleClaim.Value, out claimPermissions))

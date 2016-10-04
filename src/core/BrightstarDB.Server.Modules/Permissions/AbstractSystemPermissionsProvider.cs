@@ -7,7 +7,7 @@ namespace BrightstarDB.Server.Modules.Permissions
     {
         public abstract SystemPermissions GetPermissionsForUser(ClaimsPrincipal user);
 
-        public virtual bool HasPermissions(ClaimsPrincipal user, SystemPermissions requestedPermissions)
+        public virtual bool HasPermissions(ClaimsPrincipal principal, SystemPermissions requestedPermissions)
         {
             return (GetPermissionsForUser(principal) & requestedPermissions) == requestedPermissions;
         }

@@ -66,7 +66,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
         }
 
-        public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal user)
+        public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal principal)
         {
 
             if (principal == null || !principal.IsAuthenticated())
@@ -75,7 +75,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
 
             var calculatedPermissions = SystemPermissions.None;
-            var userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            var userName = principal.FindFirst(ClaimTypes.Name)?.Value;
             if (!string.IsNullOrEmpty(userName))
             {
                 // See if there are user-specific permissions
