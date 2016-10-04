@@ -69,7 +69,7 @@ namespace BrightstarDB.Server.Modules.Permissions
         public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal user)
         {
 
-            if (user == null || !user.IsAuthenticated())
+            if (principal == null || !principal.IsAuthenticated())
             {
                 return SystemPermissions.None;
             }
@@ -86,7 +86,7 @@ namespace BrightstarDB.Server.Modules.Permissions
                 }
             }
 
-            foreach (var claim in user.Claims)
+            foreach (var claim in principal.Claims)
             {
                 if (claim.Type == ClaimTypes.Role)
                 {

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Web.Security;
-using Nancy.Security;
 
 namespace BrightstarDB.Server.AspNet.Authentication
 {

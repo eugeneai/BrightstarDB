@@ -31,7 +31,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = browser.Get("/foo/commits", with => with.Accept(Json)).Result;
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             permissionsService.Verify();
         }
 
@@ -56,8 +56,8 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = browser.Get("/foo/commits", with => with.Accept(Json)).Result;
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var responseList = response.Result.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             brightstarService.Verify();
         }
@@ -83,6 +83,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var responseString = response.Body.AsString();
             var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             Assert.That(response.Headers.ContainsKey("Link"));
@@ -210,7 +211,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Accept(Json);
             }).Result;
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             permissionsService.Verify();
         }
 
@@ -229,7 +230,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(Json);
                 }).Result;
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             brightstarService.Verify();
         }
 

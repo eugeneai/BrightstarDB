@@ -451,7 +451,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     }
                 }
                 with.Accept(accept);
-            });
+            }).Result;
 
             Assert.That(response.Result.StatusCode, Is.EqualTo(expectedStatusCode));
          

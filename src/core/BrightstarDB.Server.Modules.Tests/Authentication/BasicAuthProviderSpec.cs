@@ -45,9 +45,9 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
                        .Returns(true);
             var userValidator = new Mock<IUserValidator>();
             userValidator.Setup(v => v.Validate("alice", "password"))
-                         .Returns(new MockUserIdentity("alice", new string[0]));
+                         .Returns(new MockUserIdentity("alice", new string[0])).Verifiable();
             var mockBrightstar = new Mock<IBrightstarService>();
-            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]).Verifiable();
             var bootstrapper = new FakeNancyBootstrapper(mockBrightstar.Object, new BasicAuthAuthenticationProvider(new BasicAuthenticationConfiguration(userValidator.Object, "test")),
                                                 new FallbackStorePermissionsProvider(StorePermissions.All),
                                                 permissions.Object);
@@ -63,6 +63,9 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             permissions.VerifyAll();
             userValidator.VerifyAll();
             mockBrightstar.VerifyAll();
+
+            Assert.That(response.Result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
         }
 
         [Test]

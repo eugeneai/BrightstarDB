@@ -19,8 +19,8 @@ namespace BrightstarDB.Server.Modules.Permissions
 
         public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
         {
-            return _first.GetStorePermissions(currentUser, storeName) |
-                   _second.GetStorePermissions(currentUser, storeName);
+            return _first.GetStorePermissions(principal, storeName) |
+                   _second.GetStorePermissions(principal, storeName);
         }
     }
 }

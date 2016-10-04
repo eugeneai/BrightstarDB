@@ -22,15 +22,21 @@ namespace BrightstarDB.Server.Modules
                     ViewBag.Title = request.StoreName + " - Statistics";
                     var resourceUri = "statistics" + CreateQueryString(request);
 
-                    // Set defaults
-                    if (!request.Latest.HasValue) {  request.Latest = DateTime.MaxValue; }
-                    if (!request.Earliest.HasValue) { request.Earliest = DateTime.MinValue; }
-                    if (request.Take <= 0) request.Take = DefaultPageSize;
+                // Set defaults
+                if (!request.Latest.HasValue)
+                {
+                    request.Latest = DateTime.MaxValue;
+                }
+                if (!request.Earliest.HasValue)
+                {
+                    request.Earliest = DateTime.MinValue;
+                }
+                if (request.Take <= 0) request.Take = DefaultPageSize;
 
-                    // Execute
-                    var stats = brightstarService.GetStatistics(
-                        request.StoreName, request.Latest.Value, request.Earliest.Value,
-                        request.Skip, request.Take + 1);
+                // Execute
+                var stats = brightstarService.GetStatistics(
+                    request.StoreName, request.Latest.Value, request.Earliest.Value,
+                    request.Skip, request.Take + 1);
 
                     return Negotiate.WithPagedList(request, stats.Select(MakeResponseModel), request.Skip, request.Take,
                                                    DefaultPageSize, resourceUri);
@@ -43,16 +49,15 @@ namespace BrightstarDB.Server.Modules
             {
                 if (requestObject.Earliest.HasValue)
                 {
-                    return String.Format("?latest={0}&earliest={1}", requestObject.Latest.Value.ToString("s"),
-                                         requestObject.Earliest.Value.ToString("s"));
+                    return $"?latest={requestObject.Latest.Value:s}&earliest={requestObject.Earliest.Value:s}";
                 }
-                return String.Format("?latest={0}", requestObject.Latest.Value.ToString("s"));
+                return $"?latest={requestObject.Latest.Value:s}";
             }
             if (requestObject.Earliest.HasValue)
             {
-                return String.Format("?earliest={0}", requestObject.Earliest.Value.ToString("s"));
+                return $"?earliest={requestObject.Earliest.Value:s}";
             }
-            return String.Empty;
+            return string.Empty;
         }
 
         private static StatisticsResponseModel MakeResponseModel(IStoreStatistics stats)

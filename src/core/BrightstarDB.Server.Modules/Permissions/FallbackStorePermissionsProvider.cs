@@ -41,7 +41,7 @@ namespace BrightstarDB.Server.Modules.Permissions
 
         public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
         {
-            return currentUser == null ? _anonymousUserPermissions : _authenticatedUserPermissions;
+            return principal == null || !principal.IsAuthenticated() ? _anonymousUserPermissions : _authenticatedUserPermissions;
         }
     }
 

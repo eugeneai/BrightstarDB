@@ -91,7 +91,7 @@ namespace BrightstarDB.Server.Modules.Permissions
 
         public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
         {
-            if (currentUser == null || !currentUser.IsAuthenticated())
+            if (principal == null || !principal.IsAuthenticated())
             {
                 return StorePermissions.None;
             }

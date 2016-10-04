@@ -57,12 +57,12 @@ namespace BrightstarDB.Server.Modules
             Post("/{storeName}/commits/{commitId}/sparql", parameters=> ProcessCommitPointQuery(parameters));
         }
 
-        private object ProcessCommitPointQuery(dynamic parameters)
+        private dynamic ProcessCommitPointQuery(dynamic parameters)
         {
             ViewBag.Title = "SPARQL";
             var requestObject = BindSparqlRequestObject();
             ulong c;
-            if (UInt64.TryParse(parameters["commitId"], out c))
+            if (ulong.TryParse(parameters["commitId"], out c))
             {
                 return
                     Negotiate.WithModel(new SparqlQueryProcessingModel(parameters["storeName"], c, _brightstar,

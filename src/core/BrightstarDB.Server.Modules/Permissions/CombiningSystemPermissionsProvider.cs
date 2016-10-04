@@ -20,13 +20,13 @@ namespace BrightstarDB.Server.Modules.Permissions
 
         public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal user)
         {
-            return _first.GetPermissionsForUser(user) | _second.GetPermissionsForUser(user);
+            return _first.GetPermissionsForUser(principal) | _second.GetPermissionsForUser(principal);
         }
 
         public override bool HasPermissions(ClaimsPrincipal user, SystemPermissions requestedPermissions)
         {
-            return _first.HasPermissions(user, requestedPermissions) ||
-                   _second.HasPermissions(user, requestedPermissions);
+            return _first.HasPermissions(principal, requestedPermissions) ||
+                   _second.HasPermissions(principal, requestedPermissions);
         }
     }
 }

@@ -3,13 +3,14 @@ using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Configuration;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Configuration;
 using Nancy.Responses;
 
 namespace BrightstarDB.Server.Modules
 {
     public static class CorsPipelinesExtension
     {
-        public static void EnableCors(this IPipelines pipelines, CorsConfiguration corsConfiguration)
+        public static void EnableCors(this IPipelines pipelines, CorsConfiguration corsConfiguration, INancyEnvironment environment)
         {
             pipelines.AfterRequest.AddItemToEndOfPipeline(ctx =>
             {

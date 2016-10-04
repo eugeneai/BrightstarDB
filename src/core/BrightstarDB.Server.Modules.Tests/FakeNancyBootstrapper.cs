@@ -72,7 +72,11 @@ namespace BrightstarDB.Server.Modules.Tests
 
         protected override Func<ITypeCatalog, NancyInternalConfiguration> InternalConfiguration
         {
-            get { return NancyInternalConfiguration.WithOverrides(config => config.StatusCodeHandlers.Clear()); }
+            get { return NancyInternalConfiguration.WithOverrides(config =>
+            {
+                config.StatusCodeHandlers.Clear();
+                //config.Serializers.Insert(0, typeof(JsonNetSerializer));
+            }); }
         }
 
         protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
@@ -81,7 +85,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 _authenticationProvider.Enable(pipelines);
             }
-            pipelines.EnableCors(new CorsConfiguration {AllowOrigin = "*", DisableCors = false});
+            pipelines.EnableCors(new CorsConfiguration {AllowOrigin = "*", DisableCors = false}, GetEnvironment());
         }
 
         public override void Configure(INancyEnvironment environment)

@@ -187,7 +187,7 @@ namespace BrightstarDB.Server.Modules
             }
             if (!_corsConfiguration.DisableCors)
             {
-                pipelines.EnableCors(_corsConfiguration);
+                pipelines.EnableCors(_corsConfiguration, GetEnvironment());
             }
         }
 

@@ -13,6 +13,7 @@ using BrightstarDB.Server.Modules.Permissions;
 using NUnit.Framework;
 using Nancy.Authentication.Basic;
 using Nancy.Security;
+using System.Security.Claims;
 
 namespace BrightstarDB.Server.IntegrationTests
 {

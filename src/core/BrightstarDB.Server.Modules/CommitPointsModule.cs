@@ -5,6 +5,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
+using Nancy.Extensions;
 using Nancy.ModelBinding;
 
 namespace BrightstarDB.Server.Modules
