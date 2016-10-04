@@ -12,7 +12,7 @@ using VDS.RDF.Parsing;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class SparqlModule : NancyModule
+    public sealed class SparqlModule : NancyModule
     {
         private static readonly MediaRange SparqlQueryMediaRange = new MediaRange("application/sparql-query");
         private static readonly MediaRange FormMediaRange = new MediaRange("application/x-www-form-urlencoded");
@@ -23,7 +23,7 @@ namespace BrightstarDB.Server.Modules
             this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.Read, post:StorePermissions.Read);
             _brightstar = brightstarService;
 
-            Get["/{storeName}/sparql"] = parameters =>
+            Get("/{storeName}/sparql", parameters =>
             {
                 ViewBag.Title = "SPARQL";
                 try
@@ -37,8 +37,8 @@ namespace BrightstarDB.Server.Modules
                     r.StatusCode = HttpStatusCode.BadRequest;
                     return r;
                 }
-            };
-            Post["/{storeName}/sparql"] = parameters =>
+            });
+            Post("/{storeName}/sparql", parameters =>
             {
                 ViewBag.Title = "SPARQL";
                 try
@@ -52,9 +52,9 @@ namespace BrightstarDB.Server.Modules
                     r.StatusCode = HttpStatusCode.BadRequest;
                     return r;
                 }
-            };
-            Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
-            Post["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
+            });
+            Get("/{storeName}/commits/{commitId}/sparql", parameters=> ProcessCommitPointQuery(parameters));
+            Post("/{storeName}/commits/{commitId}/sparql", parameters=> ProcessCommitPointQuery(parameters));
         }
 
         private object ProcessCommitPointQuery(dynamic parameters)

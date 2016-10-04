@@ -6,17 +6,16 @@ using Nancy;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class LatestStatisticsModule : NancyModule
+    public sealed class LatestStatisticsModule : NancyModule
     {
         public LatestStatisticsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read);
-            Get["/{storeName}/statistics/latest"] = parameters =>
+            Get("/{storeName}/statistics/latest", parameters =>
                 {
                     var latest = brightstarService.GetStatistics(parameters["storeName"]);
-                    if (latest == null) return HttpStatusCode.NotFound;
-                    return MakeResponseModel(latest);
-                };
+                    return latest == null ? HttpStatusCode.NotFound : MakeResponseModel(latest);
+                });
         }
 
         private static StatisticsResponseModel MakeResponseModel(IStoreStatistics stats)

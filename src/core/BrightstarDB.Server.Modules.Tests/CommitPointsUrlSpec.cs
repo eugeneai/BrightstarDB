@@ -28,7 +28,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object, permissionsService.Object));
 
             // Execute
-            var response = browser.Get("/foo/commits", with => with.Accept(Json));
+            var response = browser.Get("/foo/commits", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -53,7 +53,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
-            var response = browser.Get("/foo/commits", with => with.Accept(Json));
+            var response = browser.Get("/foo/commits", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -79,7 +79,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
-            var response = browser.Get("/foo/commits", with => with.Accept(Json));
+            var response = browser.Get("/foo/commits", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -105,7 +105,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(Json);
                     with.Query("skip", "10");
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -131,7 +131,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(Json);
                     with.Query("skip", "20");
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -157,7 +157,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(Json);
                     with.Query("timestamp", DateTime.UtcNow.ToString("s"));
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var responseObject = response.Body.DeserializeJson<CommitPointResponseModel>();
@@ -183,7 +183,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 with.Accept(Json);
                 with.Query("latest", latest);
                 with.Query("earliest", earliest);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -208,7 +208,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.JsonBody(new CommitPointResponseModel { Id = 123, StoreName = "foo" });
                 with.Accept(Json);
-            });
+            }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             permissionsService.Verify();
@@ -227,7 +227,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.JsonBody(new CommitPointResponseModel {Id = 123, StoreName = "foo"});
                     with.Accept(Json);
-                });
+                }).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             brightstarService.Verify();
@@ -244,7 +244,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.JsonBody(new CommitPointResponseModel { Id = 123, StoreName = "foo" });
                 with.Accept(Json);
-            });
+            }).Result;
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 

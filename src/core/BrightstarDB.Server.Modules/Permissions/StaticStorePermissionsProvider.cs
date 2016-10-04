@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Xml;
 using Nancy.Security;
 
@@ -88,7 +89,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
         }
 
-        public override StorePermissions GetStorePermissions(IUserIdentity currentUser, string storeName)
+        public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
         {
             if (currentUser == null || !currentUser.IsAuthenticated())
             {
@@ -96,14 +97,15 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
 
             var calculatedPermissions = StorePermissions.None;
-            if (!String.IsNullOrEmpty(currentUser.UserName))
+            var userName = currentUser.FindFirst(ClaimTypes.Name)?.Value;
+            if (!string.IsNullOrEmpty(userName))
             {
                 // See if there are user-specific permissions
                 Dictionary<string, StorePermissions> storeUserPermissions;
                 if (_storeUsers.TryGetValue(storeName, out storeUserPermissions))
                 {
                     StorePermissions userPermissions;
-                    if (storeUserPermissions.TryGetValue(currentUser.UserName, out userPermissions))
+                    if (storeUserPermissions.TryGetValue(userName, out userPermissions))
                     {
                         calculatedPermissions |= userPermissions;
                     }
@@ -113,10 +115,10 @@ namespace BrightstarDB.Server.Modules.Permissions
             Dictionary<string, StorePermissions> storeClaimPermissions;
             if (_storeClaims.TryGetValue(storeName, out storeClaimPermissions))
             {
-                foreach (var claim in currentUser.Claims)
+                foreach (var roleClaim in currentUser.FindAll(ClaimTypes.Role))
                 {
                     StorePermissions claimPermissions;
-                    if (storeClaimPermissions.TryGetValue(claim, out claimPermissions))
+                    if (storeClaimPermissions.TryGetValue(roleClaim.Value, out claimPermissions))
                     {
                         calculatedPermissions |= claimPermissions;
                     }

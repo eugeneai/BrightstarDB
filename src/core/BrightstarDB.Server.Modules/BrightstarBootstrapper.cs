@@ -8,7 +8,9 @@ using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Configuration;
 using Nancy.Conventions;
+using Nancy.Json;
 using Nancy.TinyIoc;
 
 namespace BrightstarDB.Server.Modules
@@ -160,7 +162,11 @@ namespace BrightstarDB.Server.Modules
             base.ConfigureConventions(nancyConventions);
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("assets"));
-            Nancy.Json.JsonSettings.MaxJsonLength = int.MaxValue;
+        }
+
+        public override void Configure(INancyEnvironment environment)
+        {
+            environment.Json(retainCasing: true, converters: new List<JavaScriptConverter> { new StringDictionaryConverter() }, maxJsonLength: int.MaxValue);
         }
 
         protected override IRootPathProvider RootPathProvider
@@ -185,14 +191,9 @@ namespace BrightstarDB.Server.Modules
             }
         }
 
-        protected override NancyInternalConfiguration InternalConfiguration
+        protected override Func<ITypeCatalog, NancyInternalConfiguration> InternalConfiguration
         {
             get { return NancyInternalConfiguration.WithOverrides(config => config.StatusCodeHandlers.Clear()); }
-        }
-
-        protected override void RequestStartup(TinyIoCContainer container, IPipelines pipelines, NancyContext context)
-        {
-            base.RequestStartup(container, pipelines, context);
         }
     }
 }

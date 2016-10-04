@@ -1,4 +1,5 @@
-﻿using Nancy.Security;
+﻿using System.Security.Claims;
+using Nancy.Security;
 
 namespace BrightstarDB.Server.Modules.Permissions
 {
@@ -38,7 +39,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             _anonymousUserPermissions = anonymousUserPermissions;
         }
 
-        public override StorePermissions GetStorePermissions(IUserIdentity currentUser, string storeName)
+        public override StorePermissions GetStorePermissions(ClaimsPrincipal currentUser, string storeName)
         {
             return currentUser == null ? _anonymousUserPermissions : _authenticatedUserPermissions;
         }

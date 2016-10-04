@@ -45,7 +45,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo/statistics", with => with.Accept(Json));
+            var response = app.Get("/foo/statistics", with => with.Accept(Json)).Result;
             
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -70,7 +70,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(Json);
                 with.Query("take", "2");
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -103,7 +103,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(Json);
                     with.Query("latest", now.ToString("s"));
                     with.Query("earliest", lastWeek.ToString("s"));
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -131,7 +131,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(Json);
                 with.Query("earliest", lastWeek.ToString("s"));
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -158,7 +158,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(Json);
                     with.Query("latest", now.ToString("s"));
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -184,7 +184,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(Json);
                 with.Query("skip", "10");
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -207,7 +207,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
-            var response = app.Get("/foo/statistics", with => with.Accept(Json));
+            var response = app.Get("/foo/statistics", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

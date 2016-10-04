@@ -22,7 +22,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json")));
+            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json"))).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -44,7 +44,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json")));
+            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json"))).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -54,7 +54,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestHeadExistingStoreReturnsOk()
         {
             // Setup
-            Nancy.StaticConfiguration.DisableErrorTraces = true; // NOTE: If error tracing is disabled Nancy throws a NullReferenceException on a HEAD request
+            //Nancy.StaticConfiguration.DisableErrorTraces = true; // NOTE: If error tracing is disabled Nancy throws a NullReferenceException on a HEAD request
             var mockCommitPoint = new Mock<ICommitPointInfo>();
             mockCommitPoint.Setup(m => m.CommitTime).Returns(DateTime.UtcNow);
             var brightstar = new Mock<IBrightstarService>();
@@ -63,9 +63,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Head("/foo");
+            var response = app.Head("/foo").Result;
             var responseContent = response.Body.AsString();
-            Nancy.StaticConfiguration.DisableErrorTraces = false;
+            //Nancy.StaticConfiguration.DisableErrorTraces = false;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Response status code was: {0}\nResponse body was: {1}",
@@ -81,7 +81,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Head("/foo");
+            var response = app.Head("/foo").Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -96,7 +96,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
 
             // Execute
-            var response = app.Get("/foo");
+            var response = app.Get("/foo").Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -111,7 +111,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
 
             // Execute
-            var response = app.Head("/foo");
+            var response = app.Head("/foo").Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -125,7 +125,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s=>s.DeleteStore("foo")).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Delete("/foo", c=>c.Accept(new MediaRange("application/json")));
+            var response = app.Delete("/foo", c=>c.Accept(new MediaRange("application/json"))).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             brightstar.Verify();
@@ -139,7 +139,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DeleteStore("foo")).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Delete("/foo", c => c.Accept(new MediaRange("text/html")));
+            var response = app.Delete("/foo", c => c.Accept(new MediaRange("text/html"))).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString(), Contains.Substring("Store 'foo' deleted successfully."));
@@ -157,7 +157,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
 
             // Execute
-            var response = app.Delete("/foo");
+            var response = app.Delete("/foo").Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

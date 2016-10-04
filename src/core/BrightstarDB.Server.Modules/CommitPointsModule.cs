@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
-using Nancy.Responses.Negotiation;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class CommitPointsModule : NancyModule
+    public sealed class CommitPointsModule : NancyModule
     {
         private const int DefaultPageSize = 10;
         private readonly IBrightstarService _brightstarService;
@@ -23,8 +20,8 @@ namespace BrightstarDB.Server.Modules
             _brightstarService = brightstarService;
 
             // Module routes
-            Get["/{storeName}/commits"] = GetCommitList;
-            Post["/{storeName}/commits"] = RevertToCommit;
+            Get("/{storeName}/commits", parameters=> GetCommitList(parameters));
+            Post("/{storeName}/commits", parameters=> RevertToCommit(parameters));
         }
 
         private dynamic GetCommitList(dynamic parameters)

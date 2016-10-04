@@ -1,10 +1,15 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Configuration;
+using Nancy.Json;
+using Nancy.TinyIoc;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
@@ -65,7 +70,7 @@ namespace BrightstarDB.Server.Modules.Tests
             }
         }
 
-        protected override NancyInternalConfiguration InternalConfiguration
+        protected override Func<ITypeCatalog, NancyInternalConfiguration> InternalConfiguration
         {
             get { return NancyInternalConfiguration.WithOverrides(config => config.StatusCodeHandlers.Clear()); }
         }
@@ -78,5 +83,11 @@ namespace BrightstarDB.Server.Modules.Tests
             }
             pipelines.EnableCors(new CorsConfiguration {AllowOrigin = "*", DisableCors = false});
         }
+
+        public override void Configure(INancyEnvironment environment)
+        {
+            environment.Json(retainCasing: true, converters: new List<JavaScriptConverter> { new StringDictionaryConverter() }, maxJsonLength:int.MaxValue);
+        }
+
     }
 }

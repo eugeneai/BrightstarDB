@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
@@ -176,7 +177,7 @@ namespace BrightstarDB.Server.IntegrationTests
             _passwords = new Dictionary<string, string>(passwords);
         }
 
-        public IUserIdentity Validate(string username, string password)
+        public ClaimsPrincipal Validate(string username, string password)
         {
             string pwd;
             return _passwords.TryGetValue(username, out pwd) && pwd.Equals(password)
@@ -185,16 +186,14 @@ namespace BrightstarDB.Server.IntegrationTests
         }
     }
 
-    internal class StaticUserIdentity : IUserIdentity
+    internal class StaticUserIdentity : ClaimsPrincipal
     {
-        public StaticUserIdentity(string userName)
+        public StaticUserIdentity(string userName):base(new ClaimsIdentity[] { new ClaimsIdentity(new Claim[] {new Claim(ClaimTypes.Name, userName) }) })
         {
-            UserName = userName;
-            Claims = new string[0];
         }
 
-        public string UserName { get; private set; }
-        public IEnumerable<string> Claims { get; private set; }
+        public string UserName => this.FindFirst(ClaimTypes.Name)?.Value;
+
     }
 
 }

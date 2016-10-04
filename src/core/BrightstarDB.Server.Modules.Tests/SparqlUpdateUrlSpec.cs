@@ -23,7 +23,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression"));
+            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression")).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -46,7 +46,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Body("update expression");
                     with.Header("Content-Type", "application/sparql-update");
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -66,7 +66,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression"));
+            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression")).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -81,7 +81,7 @@ namespace BrightstarDB.Server.Modules.Tests
             permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.SparqlUpdate)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
-            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression"));
+            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression")).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             permissions.Verify();
@@ -94,7 +94,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/update", with=>with.Accept(new MediaRange("text/html")));
+            var response = app.Get("/foo/update", with=>with.Accept(new MediaRange("text/html"))).Result;
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB - foo - SPARQL Update</title>"));

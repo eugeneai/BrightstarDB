@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using BrightstarDB.Client;
+﻿using System.Linq;
 using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Configuration;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Responses;
-using Nancy.Responses.Negotiation;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -31,7 +28,7 @@ namespace BrightstarDB.Server.Modules
                 {
                     // Return the exception detail as JSON
                     response = new JsonResponse(new ExceptionDetailObject(exception),
-                        new DefaultJsonSerializer()) {StatusCode = HttpStatusCode.InternalServerError};
+                        new DefaultJsonSerializer(ctx.Environment), ctx.Environment) {StatusCode = HttpStatusCode.InternalServerError};
                 }
                 else
                 {

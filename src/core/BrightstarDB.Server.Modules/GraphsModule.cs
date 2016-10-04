@@ -13,7 +13,7 @@ using StringWriter = System.IO.StringWriter;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class GraphsModule : NancyModule
+    public sealed class GraphsModule : NancyModule
     {
         private const string DefaultGraphContentQuery = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }";
         private const string NamedGraphContentQuery = "CONSTRUCT {{ ?s ?p ?o }} WHERE {{ GRAPH <{0}> {{ ?s ?p ?o }} }}";
@@ -27,10 +27,12 @@ namespace BrightstarDB.Server.Modules
         public GraphsModule(IBrightstarService brightstarService,
             AbstractStorePermissionsProvider storePermissionsProvider)
         {
-            this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read, put:StorePermissions.SparqlUpdate, post:StorePermissions.SparqlUpdate, delete:StorePermissions.SparqlUpdate);
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, get: StorePermissions.Read,
+                put: StorePermissions.SparqlUpdate, post: StorePermissions.SparqlUpdate,
+                delete: StorePermissions.SparqlUpdate);
 
 
-            Get["/{storeName}/graphs"] = parameters =>
+            Get("/{storeName}/graphs", parameters =>
             {
                 if (!brightstarService.DoesStoreExist(parameters["storeName"])) return HttpStatusCode.NotFound;
                 Uri graphUri;
@@ -58,9 +60,9 @@ namespace BrightstarDB.Server.Modules
                 {
                     return HttpStatusCode.NotModified;
                 }
-            };
+            });
 
-            Put["/{storeName}/graphs"] = parameters =>
+            Put("/{storeName}/graphs", parameters =>
             {
                 var storeParam = parameters["storeName"];
                 var store = storeParam.Value as string;
@@ -79,9 +81,9 @@ namespace BrightstarDB.Server.Modules
                     var rdfFormat = GetRequestBodyFormat();
                     if (rdfFormat == null) return HttpStatusCode.NotAcceptable;
                     var rdfPayload = ParseBody(rdfFormat);
-                    var sparqlUpdate = graphUri.ToString().Equals(Constants.DefaultGraphUri) ?
-                        String.Format(UpdateDefaultGraph, rdfPayload) :
-                        String.Format(UpdateNamedGraph, graphUri, rdfPayload);
+                    var sparqlUpdate = graphUri.ToString().Equals(Constants.DefaultGraphUri)
+                        ? String.Format(UpdateDefaultGraph, rdfPayload)
+                        : String.Format(UpdateNamedGraph, graphUri, rdfPayload);
 
                     var job = brightstarService.ExecuteUpdate(store, sparqlUpdate, true, "Update Graph " + graphUri);
                     return job.JobCompletedOk
@@ -92,9 +94,9 @@ namespace BrightstarDB.Server.Modules
                 {
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
-            Post["/{storeName}/graphs"] = parameters =>
+            Post("/{storeName}/graphs", parameters =>
             {
                 var storeParam = parameters["storeName"];
                 var store = storeParam.Value as string;
@@ -112,9 +114,9 @@ namespace BrightstarDB.Server.Modules
                     var rdfFormat = GetRequestBodyFormat();
                     if (rdfFormat == null) return HttpStatusCode.NotAcceptable;
                     var rdfPayload = ParseBody(rdfFormat);
-                    var sparqlUpdate = graphUri.ToString().Equals(Constants.DefaultGraphUri) ?
-                        String.Format(MergeDefaultGraph, rdfPayload) :
-                        String.Format(MergeNamedGraph, graphUri, rdfPayload);
+                    var sparqlUpdate = graphUri.ToString().Equals(Constants.DefaultGraphUri)
+                        ? String.Format(MergeDefaultGraph, rdfPayload)
+                        : String.Format(MergeNamedGraph, graphUri, rdfPayload);
 
                     var job = brightstarService.ExecuteUpdate(store, sparqlUpdate, true, "Update Graph " + graphUri);
                     return job.JobCompletedOk
@@ -125,9 +127,9 @@ namespace BrightstarDB.Server.Modules
                 {
                     return HttpStatusCode.BadRequest;
                 }
-            };
+            });
 
-            Delete["{storeName}/graphs"] = parameters =>
+            Delete("{storeName}/graphs", parameters =>
             {
                 Uri graphUri;
                 string sparqlUpdate, jobName;
@@ -156,8 +158,7 @@ namespace BrightstarDB.Server.Modules
                 return job.JobCompletedOk
                     ? HttpStatusCode.NoContent
                     : HttpStatusCode.InternalServerError;
-            };
-
+            });
         }
 
         private bool TryGetGraphUri(out Uri graphUri)

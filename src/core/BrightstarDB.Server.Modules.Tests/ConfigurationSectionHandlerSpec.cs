@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using System.Xml;
-using System.Xml.Linq;
 using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
-using Nancy.Security;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
@@ -43,7 +37,7 @@ namespace BrightstarDB.Server.Modules.Tests
             xml.LoadXml(SimpleConfiguration);
             var handler = new BrightstarServiceConfigurationSectionHandler();
             var config = handler.Create(null, null, xml.DocumentElement) as BrightstarServiceConfiguration;
-            var mockUser = new Mock<IUserIdentity>();
+            var mockUser = new Mock<ClaimsPrincipal>();
 
             Assert.That(config, Is.Not.Null);
             Assert.That(config.ConnectionString, Is.Not.Null);
@@ -65,7 +59,7 @@ namespace BrightstarDB.Server.Modules.Tests
             xml.LoadXml(FallbackDefaultsConfiguration);
             var handler = new BrightstarServiceConfigurationSectionHandler();
             var config = handler.Create(null, null, xml.DocumentElement) as BrightstarServiceConfiguration;
-            var mockUser = new Mock<IUserIdentity>();
+            var mockUser = new Mock<ClaimsPrincipal>();
 
             Assert.That(config, Is.Not.Null);
             Assert.That(config.ConnectionString, Is.Not.Null);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
@@ -11,14 +9,14 @@ using Nancy.ModelBinding;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class StatisticsModule : NancyModule
+    public sealed class StatisticsModule : NancyModule
     {
         private const int DefaultPageSize = 10;
 
         public StatisticsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
-            Get["/{storeName}/statistics"] = parameters =>
+            Get("/{storeName}/statistics", parameters =>
                 {
                     var request = this.Bind<StatisticsRequestObject>();
                     ViewBag.Title = request.StoreName + " - Statistics";
@@ -36,7 +34,7 @@ namespace BrightstarDB.Server.Modules
 
                     return Negotiate.WithPagedList(request, stats.Select(MakeResponseModel), request.Skip, request.Take,
                                                    DefaultPageSize, resourceUri);
-                };
+                });
         }
 
         private string CreateQueryString(StatisticsRequestObject requestObject)

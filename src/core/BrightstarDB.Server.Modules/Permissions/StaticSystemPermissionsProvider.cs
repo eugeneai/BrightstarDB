@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Xml;
 using Nancy.Security;
 
@@ -65,7 +66,7 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
         }
 
-        public override SystemPermissions GetPermissionsForUser(IUserIdentity user)
+        public override SystemPermissions GetPermissionsForUser(ClaimsPrincipal user)
         {
 
             if (user == null || !user.IsAuthenticated())
@@ -74,11 +75,12 @@ namespace BrightstarDB.Server.Modules.Permissions
             }
 
             var calculatedPermissions = SystemPermissions.None;
-            if (!String.IsNullOrEmpty(user.UserName))
+            var userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            if (!string.IsNullOrEmpty(userName))
             {
                 // See if there are user-specific permissions
                 SystemPermissions userPermissions;
-                if (_userPermissions.TryGetValue(user.UserName, out userPermissions))
+                if (_userPermissions.TryGetValue(userName, out userPermissions))
                 {
                     calculatedPermissions |= userPermissions;
                 }
@@ -86,10 +88,15 @@ namespace BrightstarDB.Server.Modules.Permissions
 
             foreach (var claim in user.Claims)
             {
-                SystemPermissions claimPermissions;
-                if (_claimPermissions.TryGetValue(claim, out claimPermissions))
+                if (claim.Type == ClaimTypes.Role)
                 {
-                    calculatedPermissions |= claimPermissions;
+                    var role = claim.Value;
+
+                    SystemPermissions claimPermissions;
+                    if (_claimPermissions.TryGetValue(role, out claimPermissions))
+                    {
+                        calculatedPermissions |= claimPermissions;
+                    }
                 }
             }
 

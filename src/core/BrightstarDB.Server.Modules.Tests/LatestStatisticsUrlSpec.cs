@@ -22,7 +22,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo/statistics/latest", with => with.Accept(Json));
+            var response = app.Get("/foo/statistics/latest", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -40,7 +40,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
-            var response = app.Get("/foo/statistics/latest", with => with.Accept(Json));
+            var response = app.Get("/foo/statistics/latest", with => with.Accept(Json)).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

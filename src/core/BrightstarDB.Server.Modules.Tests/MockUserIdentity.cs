@@ -1,25 +1,23 @@
 ﻿using System.Collections.Generic;
-using Nancy.Security;
+using System.Linq;
+using System.Security.Claims;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
-    public class MockUserIdentity : IUserIdentity
+    public sealed class MockUserIdentity : ClaimsPrincipal
     {
-        private readonly string _name;
-        private readonly string[] _claims;
-
-        public MockUserIdentity(string userName, string[] claims)
+        public MockUserIdentity(string userName, IEnumerable<string> roles):base()
         {
-            _name = userName;
-            _claims = claims;
+            if (userName != null)
+            {
+                AddIdentity(new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.Name, userName) }, "MockAuthentication"));
+            }
+            var nonNullRoles = roles.Where(r => r != null).ToList();
+            if (nonNullRoles.Any())
+            {
+                AddIdentity(new ClaimsIdentity(nonNullRoles.Select(r => new Claim(ClaimTypes.Role, r)), "MockAuthentication"));
+            }
         }
 
-
-        public string UserName
-        {
-            get { return _name; }
-        }
-
-        public IEnumerable<string> Claims { get { return _claims; } }
     }
 }

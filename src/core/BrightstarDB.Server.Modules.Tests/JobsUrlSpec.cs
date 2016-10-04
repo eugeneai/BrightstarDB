@@ -35,7 +35,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -66,7 +66,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -89,7 +89,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -113,7 +113,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s=>s.StartImport("foo", "import.nt", null, "ImportJob", null)).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s=>s.StartImport("foo", "import.nt", Constants.DefaultGraphUri, "ImportJob", null)).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateImportJob("import.nt", label:"ImportJob");
 
@@ -122,7 +122,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -145,7 +145,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -159,7 +159,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s => s.StartImport("foo", "import.nt", null, "ImportJob", It.Is<RdfFormat>(f=>f.MatchesMediaType(RdfFormat.RdfXml)))).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.StartImport("foo", "import.nt", Constants.DefaultGraphUri, "ImportJob", It.Is<RdfFormat>(f=>f.MatchesMediaType(RdfFormat.RdfXml)))).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateImportJob("import.nt", label: "ImportJob", importFormat:RdfFormat.RdfXml);
 
@@ -168,7 +168,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -202,7 +202,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -213,13 +213,13 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostSparqlUpdateWithNoExpression()
         {
-            TestBadPost("/foo/jobs", "{ JobType: \"SparqlUpdate\", JobParameters: { } }");
+            TestBadPost("/foo/jobs", "{ \"JobType\": \"SparqlUpdate\", \"JobParameters\": { } }");
         }
 
         [Test]
         public void TestPostSparqlUpdateWithEmptyExpression()
         {
-            TestBadPost("/foo/jobs", "{ JobType: \"SparqlUpdate\", JobParameters: { UpdateExpression: \"\" } }");
+            TestBadPost("/foo/jobs", "{ \"JobType\": \"SparqlUpdate\", \"JobParameters\": { \"UpdateExpression\": \"\" } }");
         }
 
         [Test]
@@ -268,7 +268,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -311,7 +311,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -324,7 +324,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Can omit preconditions
             TestValidPost("/foo/jobs",
-                          "{ JobType: \"Transaction\", JobParameters: { Deletes: \"delete\", Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
+                          "{ \"JobType\": \"Transaction\", \"JobParameters\": { \"Deletes\": \"delete\", \"Inserts\": \"insert\", \"DefaultGraphUri\":\"graph\"}}",
                           (b, m) =>
                           b.Setup(
                               s =>
@@ -341,7 +341,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Can omit delete patterns
             TestValidPost("/foo/jobs",
-                          "{ JobType: \"Transaction\", JobParameters: { Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
+                          "{ \"JobType\": \"Transaction\", \"JobParameters\": { \"Inserts\": \"insert\", \"DefaultGraphUri\":\"graph\"}}",
                           (b, m) =>
                           b.Setup(s => s.ExecuteTransaction("foo",
                                                             It.Is<UpdateTransactionData>(
@@ -355,7 +355,7 @@ namespace BrightstarDB.Server.Modules.Tests
                            .Verifiable());
 
             // Can omit inserts
-            TestValidPost("/foo/jobs", "{ JobType: \"Transaction\", JobParameters: { DefaultGraphUri:\"graph\"}}",
+            TestValidPost("/foo/jobs", "{ \"JobType\": \"Transaction\", \"JobParameters\": { \"DefaultGraphUri\":\"graph\"}}",
                           (b, m) =>
                           b.Setup(s => s.ExecuteTransaction("foo",
                                                             It.Is<UpdateTransactionData>(
@@ -481,7 +481,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.GetJobInfo("foo", 0, 11)).Returns(MockJobInfo(11)).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs", with => with.Accept(Json));
+            var response = app.Get("/foo/jobs", with => with.Accept(Json)).Result;
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             var jobs = response.Body.DeserializeJson<List<JobResponseModel>>();
@@ -517,7 +517,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 mockJob.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075", with => with.Accept(Json));
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075", with => with.Accept(Json)).Result;
             
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -540,7 +540,7 @@ namespace BrightstarDB.Server.Modules.Tests
                       .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075");
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075").Result;
 
             Assert.That(response, Is.Not.Null);
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -560,7 +560,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 with.Accept(new MediaRange("application/json"));
                 with.JsonBody(jobRequest);
-            });
+            }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -577,7 +577,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
@@ -596,7 +596,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 {
                     with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
-                });
+                }).Result;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -618,7 +618,7 @@ namespace BrightstarDB.Server.Modules.Tests
                     with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
-                });
+                }).Result;
             
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));

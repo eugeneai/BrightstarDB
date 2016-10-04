@@ -8,7 +8,7 @@ using Nancy.ModelBinding;
 
 namespace BrightstarDB.Server.Modules
 {
-    public class TransactionsModule : NancyModule
+    public sealed class TransactionsModule : NancyModule
     {
         private const int DefaultPageSize = 10;
 
@@ -16,32 +16,32 @@ namespace BrightstarDB.Server.Modules
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
 
-            Get["/{storeName}/transactions"] = parameters =>
-                {
-                    var transactionsRequest = this.Bind<TransactionsRequestObject>();
-                    ViewBag.Title = transactionsRequest.StoreName + " - Transactions";
-                    if (transactionsRequest.Take <= 0) transactionsRequest.Take = DefaultPageSize;
-                    var transactions = brightstarService.GetTransactions(transactionsRequest.StoreName,
-                                                                                 transactionsRequest.Skip,
-                                                                                 transactionsRequest.Take + 1);
-                    return Negotiate.WithPagedList(transactionsRequest,
-                                                   transactions.Select(MakeResponseObject),
-                                                   transactionsRequest.Skip, transactionsRequest.Take, DefaultPageSize,
-                                                   "transactions");
-                };
+            Get("/{storeName}/transactions", parameters =>
+            {
+                var transactionsRequest = this.Bind<TransactionsRequestObject>();
+                ViewBag.Title = transactionsRequest.StoreName + " - Transactions";
+                if (transactionsRequest.Take <= 0) transactionsRequest.Take = DefaultPageSize;
+                var transactions = brightstarService.GetTransactions(transactionsRequest.StoreName,
+                    transactionsRequest.Skip,
+                    transactionsRequest.Take + 1);
+                return Negotiate.WithPagedList(transactionsRequest,
+                    transactions.Select(MakeResponseObject),
+                    transactionsRequest.Skip, transactionsRequest.Take, DefaultPageSize,
+                    "transactions");
+            });
 
-            Get["/{storeName}/transactions/byjob/{jobId}"] = parameters =>
+            Get("/{storeName}/transactions/byjob/{jobId}", parameters =>
+            {
+                Guid jobId;
+                if (!Guid.TryParse(parameters["jobId"], out jobId))
                 {
-                    Guid jobId;
-                    if (!Guid.TryParse(parameters["jobId"], out jobId))
-                    {
-                        return HttpStatusCode.NotFound;
-                    }
-                    var storeName = parameters["storeName"];
-                    ViewBag.Title = storeName + " - Transaction - Job " + jobId;
-                    var txn = brightstarService.GetTransaction(parameters["storeName"], jobId);
-                    return txn == null ? HttpStatusCode.NotFound : MakeResponseObject(txn);
-                };
+                    return HttpStatusCode.NotFound;
+                }
+                var storeName = parameters["storeName"];
+                ViewBag.Title = storeName + " - Transaction - Job " + jobId;
+                var txn = brightstarService.GetTransaction(parameters["storeName"], jobId);
+                return txn == null ? HttpStatusCode.NotFound : MakeResponseObject(txn);
+            });
         }
 
         private static TransactionResponseModel MakeResponseObject(ITransactionInfo transactionInfo)
