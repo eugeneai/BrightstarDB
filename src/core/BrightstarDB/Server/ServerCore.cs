@@ -457,6 +457,7 @@ namespace BrightstarDB.Server
             var expressionFactories = parser.ExpressionFactories.ToList();
             expressionFactories.Add(new BrightstarFunctionFactory());
             parser.ExpressionFactories = expressionFactories;
+            Console.WriteLine("---> exp: "+exp);
             var query = parser.ParseFromString(exp);
             return query;
         }
